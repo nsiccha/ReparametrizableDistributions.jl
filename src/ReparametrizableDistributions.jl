@@ -17,7 +17,7 @@ Base.similar(what::StackedVector) = StackedVector(what.boundaries, similar(what.
 Base.similar(what::StackedVector, type::Type{S}) where {S} = StackedVector(what.boundaries, similar(what.data, type))
 Base.oftype(x::StackedVector, y::AbstractVector) = StackedVector(x.boundaries, oftype(x.data, y))
 
-TupleNamedTuple(proto, values) = (values...)
+TupleNamedTuple(proto, values) = tuple(values...)
 TupleNamedTuple(proto::NamedTuple, values) = (;zip(keys(proto), values)...)
 
 stack_vector(proto, data::AbstractVector) = StackedVector(
@@ -114,9 +114,9 @@ end
 WarmupHMC.lja_reparametrize(source::GammaSimplex, target::GammaSimplex, draw::AbstractVector, lja=0.) = begin 
     sxi = _invlogcdf.(parametrization_gammas(source), _logcdf.(Normal(), draw))
     ssum = sum(sxi)
-    tsum = invlogcdf(sum_gamma(target), logcdf(sum_gamma(source), ssum))
+    tsum = _invlogcdf(sum_gamma(target), _logcdf(sum_gamma(source), ssum))
     txi = sxi .* tsum ./ ssum
-    tdraw = invlogcdf.(Normal(), logcdf.(parametrization_gammas(target), txi))
+    tdraw = _invlogcdf.(Normal(), _logcdf.(parametrization_gammas(target), txi))
     lja += sum(logpdf.(Normal(), tdraw))
     lja -= logpdf(parametrization_distribution(target), txi ./ tsum)
     lja, tdraw
