@@ -48,8 +48,6 @@ abstract type AbstractReparametrizableDistribution end
 
 fixed(source::AbstractReparametrizableDistribution) = source.fixed
 variable(source::AbstractReparametrizableDistribution) = source.variable
-WarmupHMC.reparametrization_parameters(source::AbstractReparametrizableDistribution) = variable(source)
-WarmupHMC.reparametrize(source::AbstractReparametrizableDistribution, parameters::AbstractVector) = typeof(source)(fixed(source), oftype(variable(source), parameters))
 LogDensityProblems.dimension(source::AbstractReparametrizableDistribution) = length(source)
 LogDensityProblems.logdensity(source::AbstractReparametrizableDistribution, draw::AbstractVector) = WarmupHMC.logdensity_and_stuff(source, draw)[1]
 
@@ -57,6 +55,10 @@ struct ScaleHierarchy{F,V} <: AbstractReparametrizableDistribution
     fixed::F
     variable::V
 end
+WarmupHMC.reparametrization_parameters(source::ScaleHierarchy) = variable(source)
+WarmupHMC.reparametrize(source::ScaleHierarchy, parameters::AbstractVector) = ScaleHierarchy(
+    fixed(source), parameters
+)
 
 centeredness(source::ScaleHierarchy) = variable(source)
 Base.length(source::ScaleHierarchy) = 1+length(centeredness(source))
@@ -90,6 +92,10 @@ struct GammaSimplex{F,V} <: AbstractReparametrizableDistribution
     variable::V
 end
 GammaSimplex(dirichlet::Dirichlet) = GammaSimplex(dirichlet, dirichlet)
+WarmupHMC.reparametrization_parameters(source::GammaSimplex) = parametrization_concentrations(source)
+WarmupHMC.reparametrize(source::GammaSimplex, parameters::AbstractVector) = GammaSimplex(
+    fixed(source), Dirichlet(parameters)
+)
 
 target_distribution(source::GammaSimplex) = fixed(source)
 Base.length(source::GammaSimplex) = length(target_distribution(source))
