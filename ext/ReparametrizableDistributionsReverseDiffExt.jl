@@ -1,6 +1,6 @@
 module ReparametrizableDistributionsReverseDiffExt
 
-using ReparametrizableDistributions, ReverseDiff
+using ReparametrizableDistributions, ReverseDiff, Distributions
 
 import ReparametrizableDistributions: _cdf, _quantile, _logcdf, _invlogcdf
 

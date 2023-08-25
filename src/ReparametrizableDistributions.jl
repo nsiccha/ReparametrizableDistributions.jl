@@ -89,6 +89,7 @@ struct GammaSimplex{F,V} <: AbstractReparametrizableDistribution
     fixed::F
     variable::V
 end
+GammaSimplex(dirichlet::Dirichlet) = GammaSimplex(dirichlet, dirichlet)
 
 target_distribution(source::GammaSimplex) = fixed(source)
 Base.length(source::GammaSimplex) = length(target_distribution(source))
