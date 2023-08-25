@@ -5,4 +5,11 @@ version = "0.1.0"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+LogDensityProblems = "6fdf6af0-433a-55f7-b3ed-c6c6e0b8df7c"
 WarmupHMC = "60658175-6863-4866-a322-ab51a11c0cfe"
+
+[weakdeps]
+ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
+
+[extensions]
+ReparametrizableDistributionsReverseDiffExt = "ReverseDiff"
