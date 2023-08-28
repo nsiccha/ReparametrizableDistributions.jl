@@ -41,8 +41,8 @@ vectors(proto, data::AbstractVector) = vectors(stack_vector(proto, data))
 views(proto, data::AbstractVector) = views(stack_vector(proto, data))
 
 struct Ignore end
-Base.:+(lhs::Ignore, rhs::Real) = lhs
-Base.:-(lhs::Ignore, rhs::Real) = lhs
+Base.:+(lhs::Ignore, ::Real) = lhs
+Base.:-(lhs::Ignore, ::Real) = lhs
 
 abstract type AbstractReparametrizableDistribution end
 
@@ -81,7 +81,7 @@ end
 
 WarmupHMC.lja_reparametrize(source::ScaleHierarchy, target::ScaleHierarchy, draw::AbstractVector, lja=0.) = begin 
     log_scale, sxic = views(subdistributions(source, draw), draw)
-    txic = xic .* exp.(log_scale .* (centeredness(target) .- centeredness(source)))
+    txic = sxic .* exp.(log_scale .* (centeredness(target) .- centeredness(source)))
     tdraw = vcat(log_scale, txic)
     lja += logpdf(hierarchical_distribution(target, tdraw), txic)
     lja, tdraw
@@ -104,10 +104,21 @@ parametrization_concentrations(source::GammaSimplex) = parametrization_distribut
 parametrization_gammas(source::GammaSimplex) = Gamma.(parametrization_concentrations(source))
 sum_gamma(source::GammaSimplex) = Gamma(sum(parametrization_concentrations(source)))
 
+struct TrackedDistribution{D}
+    distribution::D
+end
+is_tracked(r) = false
+wrap_if_tracked(d) = is_tracked(d) ? TrackedDistribution(d) : d
+
 _cdf(distribution, x) = cdf(distribution, x)
 _quantile(distribution, x) = quantile(distribution, x)
-_logcdf(distribution, x) = logcdf(distribution, x)
-_invlogcdf(distribution, x) = invlogcdf(distribution, x)
+_logcdf(distribution, x) = logcdf(wrap_if_tracked(distribution), x)
+_invlogcdf(distribution, x) = invlogcdf(wrap_if_tracked(distribution), x)
+# _logcdf(d, x) = _logcdf(typeof(d), params(d), x)
+# _logcdf(T, args, x) = logcdf(T(args...), x)
+# _invlogcdf(d, lq) = _invlogcdf(typeof(d), params(d), lq) 
+# _invlogcdf(T, args, lq) = invlogcdf(T(args...), lq)
+
 
 WarmupHMC.logdensity_and_stuff(source::GammaSimplex, draw::AbstractVector, lpdf=0.) = begin 
     lpdf += sum(logpdf.(Normal(), draw)) 
