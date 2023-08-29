@@ -1,5 +1,5 @@
 using TestEnv; TestEnv.activate("ReparametrizableDistributions");
-using WarmupHMC, ReparametrizableDistributions, ReverseDiff, Distributions, Random, Test, Optim
+using WarmupHMC, ReparametrizableDistributions, ReverseDiff, Distributions, Random, Test, Optim, ChainRulesTestUtils
 
 rmse(x,y; m=mean) = sqrt(m((x.-y).^2))
 pairwise(f, arg, args...) = [
@@ -67,18 +67,50 @@ using ChainRulesCore
 using Distributions
 import ReparametrizableDistributions: _logcdf, _invlogcdf
 
+# _broadcast(f) = (args...)->_broadcast(f, args...)
+# _broadcast(f, args...) = broadcast(f, args...)
+# _broadcast(f, arg::NamedTuple) = (;zip(keys(arg), _broadcast(f, values(arg)))...)
+# _broadcast(f, arg::Thunk) = @thunk(_broadcast(f, unthunk(arg)))
+# log_prime_exp(a, lf, ldf) = a * exp(ldf - lf)
+# log_prime_exp(a, ldf_m_lf) = a * exp(ldf_m_lf)
+
 function ChainRulesCore.rrule(::typeof(_logcdf), d, x::Real)
     lq = _logcdf(d, x)
     function _logcdf_pullback(a)
-        ChainRulesCore.NoTangent(), ChainRulesCore.NoTangent(), ChainRulesCore.NoTangent(), a .* exp.(logpdf.(d, x) - lq)
+        q = exp(lq)
+        la = a / q
+        pullback(grad) = la * grad
+        da = @thunk(Tangent{typeof(d)}(;map(pullback, grad_d_cdf(d, x, q))...))
+        # da = @thunk(la * Tangent{typeof(d)}(;grad_d_cdf(d, x, q)...))
+        xa = pullback(pdf(d, x))
+        ChainRulesCore.NoTangent(), da, xa
     end
     lq, _logcdf_pullback
+end
+using SpecialFunctions, HypergeometricFunctions
+grad_d_cdf(d::Gamma, x, q) = begin 
+    a, b = params(d)
+    xi = x / b
+    # https://discourse.julialang.org/t/gamma-inc-derivatives/93148
+    g = gamma(a)
+    dg = digamma(a)
+    lx = log(xi)
+    r = pFq([a,a],[a+1,a+1],-xi)
+    grad_a = a^(-2) * xi^a * r/g + q*(dg - lx)
+    # # https://www.wolframalpha.com/input?i=D%5BGammaRegularized%5Ba%2C+0%2C+x%2Fb%5D%2C+b%5D
+    grad_b = -exp(-xi) * xi^a / (b * gamma(a))
+    (α=-grad_a::Float64, θ=grad_b::Float64)
 end
 
 function ChainRulesCore.rrule(::typeof(_invlogcdf), d, lq::Real)
     x = _invlogcdf(d, lq)
     function _invlogcdf_pullback(a)
-        ChainRulesCore.NoTangent(), ChainRulesCore.NoTangent(), ChainRulesCore.NoTangent(), a .* exp.(lq - logpdf.(d, x))
+        q = exp(lq)
+        la = a * q
+        pullback(grad) = la / grad
+        da = @thunk(Tangent{typeof(d)}(;map(pullback, grad_d_cdf(d, x, q))...))
+        lqa = pullback(pdf(d,x))
+        ChainRulesCore.NoTangent(), da, lqa 
     end
     x, _invlogcdf_pullback
 end
@@ -89,16 +121,29 @@ import ReverseDiff: TrackedReal
 #     println(ReverseDiff.value(d))
 #     invlogcdf(d, x)
 # end
-ReverseDiff.value(d::Gamma{TrackedReal{Float64, Float64, Nothing}}) = begin 
-    println("Unwrapping $d ($(eltype(d)))")
-    Gamma(ReverseDiff.value.(params(d))...)
-end
+ReverseDiff.value(d::Gamma{<:TrackedReal}) = Gamma(ReverseDiff.value.(params(d))...)
 ReverseDiff.@grad_from_chainrules _logcdf(d, x::TrackedReal)
 ReverseDiff.@grad_from_chainrules _invlogcdf(d, x::TrackedReal)
-# ReverseDiff.@grad_from_chainrules _invlogcdf(d::Gamma{TrackedReal{Float64, Float64, Nothing}}, x::Real)
+ReverseDiff.@grad_from_chainrules logcdf(d::Gamma{<:TrackedReal}, x::Real)
+ReverseDiff.@grad_from_chainrules _invlogcdf(d::Gamma{<:TrackedReal}, x::Real)
 
-ReverseDiff.@grad_from_chainrules _invlogcdf(d::TrackedDistribution, x::Real)
-# ReverseDiff.@grad_from_chainrules _invlogcdf(T::Type, P::Tuple{TrackedReal, TrackedReal}, x::Real)
+# Base.zero(::Gamma{Float64}) = Gamma(0., 0., check_args=false)
+# Base.collect(source::Gamma) = params(source)
+ChainRulesTestUtils.test_approx(actual::Distribution, expected::Distribution, args...; kwargs...) = test_approx(params(actual), params(expected), args...; kwargs...)
+
+@testset begin for idx in 1:100
+    a, b = exp.(randn(rng, 2))
+    # b = 1
+    dist = Gamma(a, b)
+    x = rand(rng, dist)
+    lq = _logcdf(dist, x)
+    re_x = _invlogcdf(dist, lq)
+
+    # @test x ≈ re_x
+    test_rrule(_logcdf, dist, x)
+    test_rrule(_invlogcdf, dist, lq)
+    break
+end end
 
 
 # ReverseDiff.@grad_from_chainrules _invlogcdf(d::UnivariateDistribution, lq::TrackedReal)

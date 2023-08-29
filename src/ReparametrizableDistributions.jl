@@ -104,16 +104,10 @@ parametrization_concentrations(source::GammaSimplex) = parametrization_distribut
 parametrization_gammas(source::GammaSimplex) = Gamma.(parametrization_concentrations(source))
 sum_gamma(source::GammaSimplex) = Gamma(sum(parametrization_concentrations(source)))
 
-struct TrackedDistribution{D}
-    distribution::D
-end
-is_tracked(r) = false
-wrap_if_tracked(d) = is_tracked(d) ? TrackedDistribution(d) : d
-
 _cdf(distribution, x) = cdf(distribution, x)
 _quantile(distribution, x) = quantile(distribution, x)
-_logcdf(distribution, x) = logcdf(wrap_if_tracked(distribution), x)
-_invlogcdf(distribution, x) = invlogcdf(wrap_if_tracked(distribution), x)
+_logcdf(distribution, x) = logcdf(distribution, x)
+_invlogcdf(distribution, x) = invlogcdf(distribution, x)
 # _logcdf(d, x) = _logcdf(typeof(d), params(d), x)
 # _logcdf(T, args, x) = logcdf(T(args...), x)
 # _invlogcdf(d, lq) = _invlogcdf(typeof(d), params(d), lq) 
