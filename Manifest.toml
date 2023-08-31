@@ -2,7 +2,7 @@
 
 julia_version = "1.9.0"
 manifest_format = "2.0"
-project_hash = "9fcb8ac9254d134e62d78ce16c5870f295f162f6"
+project_hash = "c96879d03d7d58932cb6606e3a9cc804f12a7e99"
 
 [[deps.ArgCheck]]
 git-tree-sha1 = "a3a402a35a2f7e0b87828ccabbd5ebfbebe356b4"
@@ -24,12 +24,6 @@ deps = ["LinearAlgebra"]
 git-tree-sha1 = "f641eb0a4f00c343bbc32346e1217b86f3ce9dad"
 uuid = "49dc2e85-a5d0-5ad3-a950-438e2897f1b9"
 version = "0.5.1"
-
-[[deps.ChainRulesCore]]
-deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "e30f2f4e20f7f186dc36529910beaedc60cfa644"
-uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "1.16.0"
 
 [[deps.Compat]]
 deps = ["UUIDs"]
@@ -111,6 +105,19 @@ weakdeps = ["SparseArrays", "Statistics"]
     [deps.FillArrays.extensions]
     FillArraysSparseArraysExt = "SparseArrays"
     FillArraysStatisticsExt = "Statistics"
+
+[[deps.HSGPs]]
+deps = ["Distributions", "LogExpFunctions"]
+git-tree-sha1 = "3fe6df2844853648bf94f13d0db1ea7843396aa1"
+repo-rev = "main"
+repo-url = "https://github.com/nsiccha/HSGPs.jl"
+uuid = "ad3833d4-b61d-4c64-b982-47e845742538"
+version = "0.1.0"
+weakdeps = ["LogDensityProblems", "WarmupHMC"]
+
+    [deps.HSGPs.extensions]
+    HSGPsLogDensityProblemsExt = "LogDensityProblems"
+    HSGPsWarmupHMCExt = "WarmupHMC"
 
 [[deps.HypergeometricFunctions]]
 deps = ["DualNumbers", "LinearAlgebra", "OpenLibm_jll", "SpecialFunctions"]
@@ -311,10 +318,12 @@ deps = ["IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_j
 git-tree-sha1 = "e2cfc4012a19088254b3950b85c3c1d8882d864d"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
 version = "2.3.1"
-weakdeps = ["ChainRulesCore"]
 
     [deps.SpecialFunctions.extensions]
     SpecialFunctionsChainRulesCoreExt = "ChainRulesCore"
+
+    [deps.SpecialFunctions.weakdeps]
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 
 [[deps.Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
@@ -384,7 +393,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[deps.WarmupHMC]]
 deps = ["Distributions", "DynamicObjects", "LinearAlgebra", "LogDensityProblems", "Random", "UnPack"]
-git-tree-sha1 = "f26888c72f1ebb968a8ecc6ea2beeedaad0162d6"
+git-tree-sha1 = "71357d3f838563b5e17406d10e7f53383e375fc2"
 repo-rev = "main"
 repo-url = "https://github.com/nsiccha/WarmupHMC.jl"
 uuid = "60658175-6863-4866-a322-ab51a11c0cfe"
