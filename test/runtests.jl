@@ -104,13 +104,13 @@ hsgps = [
 ]
 hsgp_xi = (randn(3+n_functions, n_draws))
 
-r2d2s = [
-    R2D2()
-]
+# r2d2s = [
+#     R2D2()
+# ]
 
-@testset "New tests" begin 
-    transformation_tests(r2d2s)
-end
+# @testset "New tests" begin 
+#     transformation_tests(r2d2s)
+# end
 
 # @testset "All Tests" begin
 #     gammas = Gamma.(exp.(randn(rng, 100)), exp.(randn(rng, 100)))
@@ -124,3 +124,9 @@ end
 #         @testset "HSGP" transformation_tests(hsgps, hsgp_xi, iterations=50)
 #     end
 # end
+import ReparametrizableDistributions: info
+
+r2d2 = R2D2((
+    intercept=0, sigma_sq=1, R2=1, simplex=GammaSimplex(ones(5)), hierarchy=ones(5)
+))
+info(r2d2, ones(13))

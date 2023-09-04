@@ -4,6 +4,7 @@ struct GammaSimplex{F,V} <: AbstractReparametrizableDistribution
     fixed::F
     variable::V
 end
+GammaSimplex(concentration::AbstractVector) = GammaSimplex(Dirichlet(concentration))
 GammaSimplex(dirichlet::Dirichlet) = GammaSimplex(dirichlet, dirichlet)
 reparametrization_parameters(source::GammaSimplex) = parametrization_concentrations(source)
 unconstrained_reparametrization_parameters(source::GammaSimplex) = log.(parametrization_concentrations(source))
