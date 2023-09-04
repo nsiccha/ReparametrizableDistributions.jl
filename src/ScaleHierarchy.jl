@@ -1,22 +1,21 @@
-struct ScaleHierarchy{F,V} <: AbstractReparametrizableDistribution
-    fixed::F
-    variable::V
+struct ScaleHierarchy{I} <: AbstractReparametrizableDistribution
+    info::I
 end
-reparametrization_parameters(source::ScaleHierarchy) = variable(source)
-reparametrize(source::ScaleHierarchy, parameters::AbstractVector) = ScaleHierarchy(
-    fixed(source), parameters
-)
+# reparametrization_parameters(source::ScaleHierarchy) = variable(source)
+# reparametrize(source::ScaleHierarchy, parameters::AbstractVector) = ScaleHierarchy(
+#     fixed(source), parameters
+# )
 
-centeredness(source::ScaleHierarchy) = variable(source)
-Base.length(source::ScaleHierarchy) = 1+length(centeredness(source))
+# centeredness(source::ScaleHierarchy) = variable(source)
+# Base.length(source::ScaleHierarchy) = 1+length(centeredness(source))
 
-log_scale_distribution(source::ScaleHierarchy, ::Any) = Product([fixed(source)])
-hierarchical_distribution(source::ScaleHierarchy, draw::AbstractVector) = begin 
-    log_scale = draw[1]
-    scales = exp.(log_scale .* centeredness(source))
-    Product(Normal.(0, scales))
-end
-subdistributions(source::ScaleHierarchy, draw::AbstractVector) = log_scale_distribution(source, draw), hierarchical_distribution(source, draw)
+# log_scale_distribution(source::ScaleHierarchy, ::Any) = Product([fixed(source)])
+# hierarchical_distribution(source::ScaleHierarchy, draw::AbstractVector) = begin 
+#     log_scale = draw[1]
+#     scales = exp.(log_scale .* centeredness(source))
+#     Product(Normal.(0, scales))
+# end
+# subdistributions(source::ScaleHierarchy, draw::AbstractVector) = log_scale_distribution(source, draw), hierarchical_distribution(source, draw)
 
 @views logdensity_and_stuff(source::ScaleHierarchy, draw::AbstractVector, lpdf=0.) = begin 
     sdists = subdistributions(source, draw)

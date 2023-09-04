@@ -2,7 +2,7 @@
 
 julia_version = "1.9.3"
 manifest_format = "2.0"
-project_hash = "cf89438c7a920da484f4ac21cc817b97126bf2a7"
+project_hash = "594cb6e0ac6ff798322d6655c398ce1fd2538a42"
 
 [[deps.ArgCheck]]
 git-tree-sha1 = "a3a402a35a2f7e0b87828ccabbd5ebfbebe356b4"
@@ -111,19 +111,6 @@ weakdeps = ["SparseArrays", "Statistics"]
     [deps.FillArrays.extensions]
     FillArraysSparseArraysExt = "SparseArrays"
     FillArraysStatisticsExt = "Statistics"
-
-[[deps.HSGPs]]
-deps = ["Distributions", "LogExpFunctions"]
-git-tree-sha1 = "3fe6df2844853648bf94f13d0db1ea7843396aa1"
-repo-rev = "main"
-repo-url = "https://github.com/nsiccha/HSGPs.jl"
-uuid = "ad3833d4-b61d-4c64-b982-47e845742538"
-version = "0.1.0"
-weakdeps = ["LogDensityProblems", "WarmupHMC"]
-
-    [deps.HSGPs.extensions]
-    HSGPsLogDensityProblemsExt = "LogDensityProblems"
-    HSGPsWarmupHMCExt = "WarmupHMC"
 
 [[deps.HypergeometricFunctions]]
 deps = ["DualNumbers", "LinearAlgebra", "OpenLibm_jll", "SpecialFunctions"]

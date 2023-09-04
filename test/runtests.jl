@@ -1,5 +1,5 @@
 using TestEnv; TestEnv.activate("ReparametrizableDistributions");
-using WarmupHMC, ReparametrizableDistributions, ReverseDiff, Distributions, Random, Test, Optim, ChainRulesTestUtils, HSGPs
+using WarmupHMC, ReparametrizableDistributions, ReverseDiff, Distributions, Random, Test, Optim, ChainRulesTestUtils
 
 import ReparametrizableDistributions: _logcdf, _invlogcdf
 

@@ -29,12 +29,12 @@ _invlogcdf(distribution, x) = invlogcdf(distribution, x)
 
 
 logdensity_and_stuff(source::GammaSimplex, draw::AbstractVector, lpdf=0.) = begin 
-    lpdf += sum(logpdf.(Normal(), draw)) 
     xi = _invlogcdf.(parametrization_gammas(source), _logcdf.(Normal(), draw))
     x = xi ./ sum(xi)
+    lpdf += sum(logpdf.(Normal(), draw)) 
     lpdf += logpdf(target_distribution(source), x) 
     lpdf -= logpdf(parametrization_distribution(source), x)
-    lpdf, x
+    (;lpdf, x)
 end
 
 lja_reparametrize(source::GammaSimplex, target::GammaSimplex, draw::AbstractVector, lja=0.) = begin 
