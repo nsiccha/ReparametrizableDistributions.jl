@@ -5,12 +5,12 @@ struct GammaSimplex{F,V} <: AbstractReparametrizableDistribution
     variable::V
 end
 GammaSimplex(dirichlet::Dirichlet) = GammaSimplex(dirichlet, dirichlet)
-WarmupHMC.reparametrization_parameters(source::GammaSimplex) = parametrization_concentrations(source)
-WarmupHMC.unconstrained_reparametrization_parameters(source::GammaSimplex) = log.(parametrization_concentrations(source))
-WarmupHMC.reparametrize(source::GammaSimplex, parameters::AbstractVector) = GammaSimplex(
+reparametrization_parameters(source::GammaSimplex) = parametrization_concentrations(source)
+unconstrained_reparametrization_parameters(source::GammaSimplex) = log.(parametrization_concentrations(source))
+reparametrize(source::GammaSimplex, parameters::AbstractVector) = GammaSimplex(
     fixed(source), Dirichlet(parameters)
 )
-WarmupHMC.unconstrained_reparametrize(source::GammaSimplex, parameters::AbstractVector) = GammaSimplex(
+unconstrained_reparametrize(source::GammaSimplex, parameters::AbstractVector) = GammaSimplex(
     fixed(source), Dirichlet(exp.(parameters))
 )
 
@@ -27,7 +27,7 @@ _logcdf(distribution, x) = logcdf(distribution, x)
 _invlogcdf(distribution, x) = invlogcdf(distribution, x)
 
 
-WarmupHMC.logdensity_and_stuff(source::GammaSimplex, draw::AbstractVector, lpdf=0.) = begin 
+logdensity_and_stuff(source::GammaSimplex, draw::AbstractVector, lpdf=0.) = begin 
     lpdf += sum(logpdf.(Normal(), draw)) 
     xi = _invlogcdf.(parametrization_gammas(source), _logcdf.(Normal(), draw))
     x = xi ./ sum(xi)
@@ -36,7 +36,7 @@ WarmupHMC.logdensity_and_stuff(source::GammaSimplex, draw::AbstractVector, lpdf=
     lpdf, x
 end
 
-WarmupHMC.lja_reparametrize(source::GammaSimplex, target::GammaSimplex, draw::AbstractVector, lja=0.) = begin 
+lja_reparametrize(source::GammaSimplex, target::GammaSimplex, draw::AbstractVector, lja=0.) = begin 
     sxi = _invlogcdf.(parametrization_gammas(source), _logcdf.(Normal(), draw))
     ssum = sum(sxi)
     tsum = _invlogcdf(sum_gamma(target), _logcdf(sum_gamma(source), ssum))

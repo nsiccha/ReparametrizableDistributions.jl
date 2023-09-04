@@ -2,8 +2,8 @@ struct ScaleHierarchy{F,V} <: AbstractReparametrizableDistribution
     fixed::F
     variable::V
 end
-WarmupHMC.reparametrization_parameters(source::ScaleHierarchy) = variable(source)
-WarmupHMC.reparametrize(source::ScaleHierarchy, parameters::AbstractVector) = ScaleHierarchy(
+reparametrization_parameters(source::ScaleHierarchy) = variable(source)
+reparametrize(source::ScaleHierarchy, parameters::AbstractVector) = ScaleHierarchy(
     fixed(source), parameters
 )
 
@@ -18,7 +18,7 @@ hierarchical_distribution(source::ScaleHierarchy, draw::AbstractVector) = begin
 end
 subdistributions(source::ScaleHierarchy, draw::AbstractVector) = log_scale_distribution(source, draw), hierarchical_distribution(source, draw)
 
-@views WarmupHMC.logdensity_and_stuff(source::ScaleHierarchy, draw::AbstractVector, lpdf=0.) = begin 
+@views logdensity_and_stuff(source::ScaleHierarchy, draw::AbstractVector, lpdf=0.) = begin 
     sdists = subdistributions(source, draw)
     log_scale, xic = subdraws = views(sdists, draw)
     lpdf += sum(logpdf.(sdists, subdraws))
@@ -26,7 +26,7 @@ subdistributions(source::ScaleHierarchy, draw::AbstractVector) = log_scale_distr
     lpdf, x
 end
 
-WarmupHMC.lja_reparametrize(source::ScaleHierarchy, target::ScaleHierarchy, draw::AbstractVector, lja=0.) = begin 
+lja_reparametrize(source::ScaleHierarchy, target::ScaleHierarchy, draw::AbstractVector, lja=0.) = begin 
     log_scale, sxic = views(subdistributions(source, draw), draw)
     txic = sxic .* exp.(log_scale .* (centeredness(target) .- centeredness(source)))
     tdraw = vcat(log_scale, txic)

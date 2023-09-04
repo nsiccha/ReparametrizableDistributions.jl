@@ -1,4 +1,4 @@
-abstract type AbstractReparametrizableDistribution end
+abstract type AbstractReparametrizableDistribution <: ContinuousMultivariateDistribution end
 
 fixed(source::AbstractReparametrizableDistribution) = source.fixed
 variable(source::AbstractReparametrizableDistribution) = source.variable

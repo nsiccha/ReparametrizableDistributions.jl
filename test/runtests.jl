@@ -1,4 +1,4 @@
-# using TestEnv; TestEnv.activate("ReparametrizableDistributions");
+using TestEnv; TestEnv.activate("ReparametrizableDistributions");
 using WarmupHMC, ReparametrizableDistributions, ReverseDiff, Distributions, Random, Test, Optim, ChainRulesTestUtils, HSGPs
 
 import ReparametrizableDistributions: _logcdf, _invlogcdf
@@ -7,36 +7,37 @@ rmse(x,y; m=mean) = sqrt(m((x.-y).^2))
 pairwise(f, arg, args...; kwargs...) = [
     f(lhs, rhs, args...; kwargs...) for lhs in arg, rhs in arg
 ]
-transformation_tests(parametrizations, draws; kwargs...) = begin 
+transformation_tests(parametrizations, args...; kwargs...) = begin 
     @testset "identity" pairwise(reparametrization_test, parametrizations)
-    @testset "rmse" pairwise(rmse_test, parametrizations, draws)
-    @testset "loss" pairwise(loss_test, parametrizations, draws)
-    @testset "easy_convergence" pairwise(easy_convergence_test, parametrizations, draws)
-    @testset "hard_convergence" pairwise(hard_convergence_test, parametrizations, draws; kwargs...)
+    @testset "rmse" pairwise(rmse_test, parametrizations, args...)
+    @testset "loss" pairwise(loss_test, parametrizations, args...)
+    @testset "easy_convergence" pairwise(easy_convergence_test, parametrizations, args...)
+    @testset "hard_convergence" pairwise(hard_convergence_test, parametrizations, args...; kwargs...)
 end 
+test_draws(lhs; seed=0, n_draws=100) = randn(Xoshiro(seed), (length(lhs), n_draws))
 reparametrization_test(lhs, rhs) = begin 
     parameters = WarmupHMC.reparametrization_parameters.([lhs, rhs])
     rlhs = WarmupHMC.reparametrize(lhs, parameters[2])
     lrlhs = WarmupHMC.reparametrize(rlhs, parameters[1])
     @test lhs == lrlhs
 end
-rmse_test(lhs, rhs, draws) = begin
+rmse_test(lhs, rhs, draws=test_draws(lhs)) = begin
     rdraws = WarmupHMC.reparametrize(lhs, rhs, draws)
     lrdraws = WarmupHMC.reparametrize(rhs, lhs, rdraws)
     @test rmse(draws, lrdraws) < 1e-8
 end
-loss_test(lhs, rhs, draws) = begin
+loss_test(lhs, rhs, draws=test_draws(lhs)) = begin
     parameters = WarmupHMC.reparametrization_parameters.([lhs, rhs])
     loss = WarmupHMC.reparametrization_loss_function(lhs, draws)
     lloss, rloss = loss.(parameters)
     @test lloss <= rloss
 end
-easy_convergence_test(lhs, rhs, draws) = begin 
+easy_convergence_test(lhs, rhs, draws=test_draws(lhs)) = begin 
     flhs = WarmupHMC.find_reparametrization(:ReverseDiff, lhs, draws)
     lp, rp, fp = WarmupHMC.reparametrization_parameters.([lhs, rhs, flhs])
     @test rmse(lp, fp) <= rmse(rp, fp)
 end
-hard_convergence_test(lhs, rhs, draws; kwargs...) = begin 
+hard_convergence_test(lhs, rhs, draws=test_draws(lhs); kwargs...) = begin 
     rdraws = WarmupHMC.reparametrize(lhs, rhs, draws)
     flhs = WarmupHMC.find_reparametrization(:ReverseDiff, rhs, rdraws; kwargs...)
     lp, rp, fp = WarmupHMC.reparametrization_parameters.([lhs, rhs, flhs])
@@ -103,15 +104,23 @@ hsgps = [
 ]
 hsgp_xi = (randn(3+n_functions, n_draws))
 
-@testset "All Tests" begin
-    gammas = Gamma.(exp.(randn(rng, 100)), exp.(randn(rng, 100)))
-    qs = rand(rng, 100)
-    @testset "Sensitivities" begin
-        @testset "Gamma" sensitivity_tests(gammas, qs)
-    end
-    @testset "Transformation tests" begin
-        @testset "ScaleHierarchy" transformation_tests(hierarchies, xi)
-        @testset "GammaSimplex" transformation_tests(simplices, xi)
-        @testset "HSGP" transformation_tests(hsgps, hsgp_xi, iterations=50)
-    end
+r2d2s = [
+    R2D2()
+]
+
+@testset "New tests" begin 
+    transformation_tests(r2d2s)
 end
+
+# @testset "All Tests" begin
+#     gammas = Gamma.(exp.(randn(rng, 100)), exp.(randn(rng, 100)))
+#     qs = rand(rng, 100)
+#     @testset "Sensitivities" begin
+#         @testset "Gamma" sensitivity_tests(gammas, qs)
+#     end
+#     @testset "Transformation tests" begin
+#         @testset "ScaleHierarchy" transformation_tests(hierarchies, xi)
+#         @testset "GammaSimplex" transformation_tests(simplices, xi)
+#         @testset "HSGP" transformation_tests(hsgps, hsgp_xi, iterations=50)
+#     end
+# end
