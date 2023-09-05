@@ -1,50 +1,48 @@
 using SpecialFunctions, HypergeometricFunctions, ChainRulesCore
 
-struct GammaSimplex{F,V} <: AbstractReparametrizableDistribution
-    fixed::F
-    variable::V
+struct GammaSimplex{I} <: AbstractReparametrizableDistribution
+    info::I
 end
 GammaSimplex(concentration::AbstractVector) = GammaSimplex(Dirichlet(concentration))
-GammaSimplex(dirichlet::Dirichlet) = GammaSimplex(dirichlet, dirichlet)
-reparametrization_parameters(source::GammaSimplex) = parametrization_concentrations(source)
-unconstrained_reparametrization_parameters(source::GammaSimplex) = log.(parametrization_concentrations(source))
+GammaSimplex(target::Dirichlet) = GammaSimplex(target, target)
+GammaSimplex(target::Dirichlet, parametrization::Dirichlet) = GammaSimplex((
+    target_distribution=target,
+    parametrization_distribution=parametrization,
+    parametrization_gammas=Gamma.(parametrization.alpha),
+    sum_gamma=Gamma(sum(parametrization.alpha)),
+))
+Base.length(source::GammaSimplex) = length(info(source).target_distribution)
+reparametrization_parameters(source::GammaSimplex) = log.(info(source).parametrization_distribution.alpha)
 reparametrize(source::GammaSimplex, parameters::AbstractVector) = GammaSimplex(
-    fixed(source), Dirichlet(parameters)
+    info(source).target_distribution, Dirichlet(exp.(parameters))
 )
-unconstrained_reparametrize(source::GammaSimplex, parameters::AbstractVector) = GammaSimplex(
-    fixed(source), Dirichlet(exp.(parameters))
-)
-
-target_distribution(source::GammaSimplex) = fixed(source)
-Base.length(source::GammaSimplex) = length(target_distribution(source))
-parametrization_distribution(source::GammaSimplex) = variable(source)
-parametrization_concentrations(source::GammaSimplex) = parametrization_distribution(source).alpha
-parametrization_gammas(source::GammaSimplex) = Gamma.(parametrization_concentrations(source))
-sum_gamma(source::GammaSimplex) = Gamma(sum(parametrization_concentrations(source)))
 
 _cdf(distribution, x) = cdf(distribution, x)
 _quantile(distribution, x) = quantile(distribution, x)
 _logcdf(distribution, x) = logcdf(distribution, x)
 _invlogcdf(distribution, x) = invlogcdf(distribution, x)
 
-
 logdensity_and_stuff(source::GammaSimplex, draw::AbstractVector, lpdf=0.) = begin 
-    xi = _invlogcdf.(parametrization_gammas(source), _logcdf.(Normal(), draw))
-    x = xi ./ sum(xi)
+    _info = info(source)
+    # _views = views(source, draw)
+    unnormalized_weights = _invlogcdf.(_info.parametrization_gammas, _logcdf.(Normal(), draw)) 
+    weights = unnormalized_weights ./ sum(unnormalized_weights)
     lpdf += sum(logpdf.(Normal(), draw)) 
-    lpdf += logpdf(target_distribution(source), x) 
-    lpdf -= logpdf(parametrization_distribution(source), x)
-    (;lpdf, x)
+    lpdf += logpdf(_info.target_distribution, weights) 
+    lpdf -= logpdf(_info.parametrization_distribution, weights)
+    (;lpdf, unnormalized_weights, weights)
 end
 
 lja_reparametrize(source::GammaSimplex, target::GammaSimplex, draw::AbstractVector, lja=0.) = begin 
-    sxi = _invlogcdf.(parametrization_gammas(source), _logcdf.(Normal(), draw))
+    _info = info(source)
+    tinfo = info(target)
+    sxi = _invlogcdf.(_info.parametrization_gammas, _logcdf.(Normal(), draw))
     ssum = sum(sxi)
-    tsum = _invlogcdf(sum_gamma(target), _logcdf(sum_gamma(source), ssum))
+    tsum = _invlogcdf(tinfo.sum_gamma, _logcdf(_info.sum_gamma, ssum))
     txi = sxi .* tsum ./ ssum
-    tdraw = _invlogcdf.(Normal(), _logcdf.(parametrization_gammas(target), txi))
+    tdraw = _invlogcdf.(Normal(), _logcdf.(tinfo.parametrization_gammas, txi))
     lja += sum(logpdf.(Normal(), tdraw))
-    lja -= logpdf(parametrization_distribution(target), txi ./ tsum)
+    lja -= logpdf(tinfo.parametrization_distribution, txi ./ tsum)
     lja, tdraw
 end
 

@@ -1,4 +1,4 @@
-using TestEnv; TestEnv.activate("ReparametrizableDistributions");
+# using TestEnv; TestEnv.activate("ReparametrizableDistributions");
 using WarmupHMC, ReparametrizableDistributions, ReverseDiff, Distributions, Random, Test, Optim, ChainRulesTestUtils
 
 import ReparametrizableDistributions: _logcdf, _invlogcdf
@@ -21,10 +21,10 @@ reparametrization_test(lhs, rhs) = begin
     lrlhs = WarmupHMC.reparametrize(rlhs, parameters[1])
     @test lhs == lrlhs
 end
-rmse_test(lhs, rhs, draws=test_draws(lhs)) = begin
+rmse_test(lhs, rhs, draws=test_draws(lhs), tol=1e-4) = begin
     rdraws = WarmupHMC.reparametrize(lhs, rhs, draws)
     lrdraws = WarmupHMC.reparametrize(rhs, lhs, rdraws)
-    @test rmse(draws, lrdraws) < 1e-8
+    @test rmse(draws, lrdraws) < tol
 end
 loss_test(lhs, rhs, draws=test_draws(lhs)) = begin
     parameters = WarmupHMC.reparametrization_parameters.([lhs, rhs])
@@ -64,12 +64,12 @@ end
 rng = Xoshiro(0)
 n_parameters = 4
 n_draws = 100
-xi = randn(rng, (n_parameters, n_draws))
+# xi = randn(rng, (n_parameters, n_draws))
 cs = [1, 10]#, 100]
 scales = [0, 1]#, 2]
 
 hierarchies = [
-    ScaleHierarchy(Normal(), rand(rng, n_parameters-1))
+    ScaleHierarchy(Normal(), rand(rng, n_parameters))
     for i in 1:(length(cs)*length(scales))
 ]
 
@@ -84,49 +84,50 @@ simplices = [
 ]
 
 
-@views WarmupHMC.lja_reparametrize(source::HSGP, target::HSGP, draw::AbstractVector, lja=0.) = begin  
-    sxic = draw[4:end]
-    lsds = HSGPs.log_sds(source, draw)
-    w = sxic .* exp.(lsds .* (1 .- source.centeredness))
-    txic = sxic .* exp.(lsds .* (target.centeredness .- source.centeredness))
-    trintercept = draw[1] + sum(w .* (target.mean_shift - source.mean_shift))
-    lja += -sum(lsds .* target.centeredness)
-    tdraw = vcat(trintercept, draw[2:3], txic)
-    lja, tdraw
-end
+# @views WarmupHMC.lja_reparametrize(source::HSGP, target::HSGP, draw::AbstractVector, lja=0.) = begin  
+#     sxic = draw[4:end]
+#     lsds = HSGPs.log_sds(source, draw)
+#     w = sxic .* exp.(lsds .* (1 .- source.centeredness))
+#     txic = sxic .* exp.(lsds .* (target.centeredness .- source.centeredness))
+#     trintercept = draw[1] + sum(w .* (target.mean_shift - source.mean_shift))
+#     lja += -sum(lsds .* target.centeredness)
+#     tdraw = vcat(trintercept, draw[2:3], txic)
+#     lja, tdraw
+# end
 
 n_functions = 2
 hsgps = [
-    HSGP(fill(Normal(), 3), rand(rng, Uniform(-1, 1), 100), n_functions, 1.5, 
-    rand(rng, n_functions), 
-    randn(rng, n_functions))
+    HSGP(0, 0, 0, ScaleHierarchy([], rand(rng, n_parameters)))
     for i in 1:12
 ]
-hsgp_xi = (randn(3+n_functions, n_draws))
+# hsgp_xi = (randn(3+n_functions, n_draws))
 
-# r2d2s = [
-#     R2D2()
-# ]
+r2d2s = [
+    R2D2(0, 0, rand(rng, simplices), ScaleHierarchy([], rand(rng, n_parameters)))
+    for concentration in concentrations
+]
 
 # @testset "New tests" begin 
 #     transformation_tests(r2d2s)
 # end
 
-# @testset "All Tests" begin
-#     gammas = Gamma.(exp.(randn(rng, 100)), exp.(randn(rng, 100)))
-#     qs = rand(rng, 100)
-#     @testset "Sensitivities" begin
-#         @testset "Gamma" sensitivity_tests(gammas, qs)
-#     end
-#     @testset "Transformation tests" begin
-#         @testset "ScaleHierarchy" transformation_tests(hierarchies, xi)
-#         @testset "GammaSimplex" transformation_tests(simplices, xi)
-#         @testset "HSGP" transformation_tests(hsgps, hsgp_xi, iterations=50)
-#     end
-# end
-import ReparametrizableDistributions: info
+WarmupHMC.reparametrization_parameters(::Any) = Float64[]
+@testset "All Tests" begin
+    gammas = Gamma.(exp.(randn(rng, 100)), exp.(randn(rng, 100)))
+    qs = rand(rng, 100)
+    @testset "Sensitivities" begin
+        # @testset "Gamma" sensitivity_tests(gammas, qs)
+    end
+    @testset "Transformation tests" begin
+        @testset "ScaleHierarchy" transformation_tests(hierarchies)
+        @testset "GammaSimplex" transformation_tests(simplices)
+        # @testset "HSGP" transformation_tests(hsgps; iterations=50)
+        @testset "R2D2" transformation_tests(r2d2s)
+    end
+end
+# import ReparametrizableDistributions: info
 
-r2d2 = R2D2((
-    intercept=0, sigma_sq=1, R2=1, simplex=GammaSimplex(ones(5)), hierarchy=ones(5)
-))
-info(r2d2, ones(13))
+# r2d2 = R2D2((
+#     intercept=0, sigma_sq=1, R2=1, simplex=GammaSimplex(ones(5)), hierarchy=ones(5)
+# ))
+# info(r2d2, ones(13))

@@ -17,6 +17,10 @@ Base.oftype(x::StackedVector, y::AbstractVector) = StackedVector(x.boundaries, o
 TupleNamedTuple(::Any, values) = tuple(values...)
 TupleNamedTuple(proto::NamedTuple, values) = (;zip(keys(proto), values)...)
 
+stack_vector_sized(proto, data::AbstractVector) = StackedVector(
+    TupleNamedTuple(proto, cumsum(values(proto))),
+    data
+)
 stack_vector(proto, data::AbstractVector) = StackedVector(
     TupleNamedTuple(proto, cumsum(length.(values(proto)))),
     data
@@ -35,6 +39,9 @@ general_slice(what::StackedVector, f) = TupleNamedTuple(
 vectors(what::StackedVector) = general_slice(what, getindex)
 views(what::StackedVector) = general_slice(what, view)
 vectors(proto, data::AbstractVector) = vectors(stack_vector(proto, data))
+views_sized(proto, data::AbstractVector) = views(stack_vector_sized(proto, data))
 views(proto, data::AbstractVector) = views(stack_vector(proto, data))
 # Base.getproperty(what::StackedVector, key::Symbol) = hasfield(StackedVector, key) ? getfield(what, key) : getproperty(views(what), key)
 Base.map(f::Function, first::StackedVector, args...; kwargs...) = StackedVector(map(f, views(first), args...; kwargs...))
+
+sum_logpdf(dists, xs) = sum(logpdf.(dists, xs))
