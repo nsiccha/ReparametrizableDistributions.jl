@@ -20,15 +20,15 @@ end
 #     X = sin.((x .+ boundary_factor) .* (pi/(2*boundary_factor)) .* idxs') ./ sqrt(boundary_factor)
 #     HSGP(hyperprior, pre_eig, X, centeredness, mean_shift)
 # end
-reparametrization_parameters(source::HSGP) = vcat(source.centeredness, source.mean_shift)
-reparametrize(source::HSGP, parameters::AbstractVector) = HSGP(
-    source.hyperprior,
-    source.pre_eig,
-    source.X,
-    collect.(eachcol(reshape(parameters, (:, 2))))...
-)
+# reparametrization_parameters(source::HSGP) = vcat(source.centeredness, source.mean_shift)
+# reparametrize(source::HSGP, parameters::AbstractVector) = HSGP(
+#     source.hyperprior,
+#     source.pre_eig,
+#     source.X,
+#     collect.(eachcol(reshape(parameters, (:, 2))))...
+# )
 
-logdensity_and_stuff(source::HSGP, draw::AbstractVector, lpdf=0.) = begin
+lpdf_and_invariants(source::HSGP, draw::AbstractVector, lpdf=0.) = begin
     _info, _views = info_and_views(source, draw)
     # alpha * sqrt(sqrt(2*pi()) * rho) * exp(-0.25*(rho*pi()/2/L)^2 * linspaced_vector(M, 1, M)^2);
     lengthscale = exp.(_views.log_lengthscale)
@@ -45,7 +45,7 @@ logdensity_and_stuff(source::HSGP, draw::AbstractVector, lpdf=0.) = begin
     (;lpdf, lengthscale, log_sd, weights, intercept)
 end
 @views lja_reparametrize(source::HSGP, target::HSGP, draw::AbstractVector, lja=0.) = begin  
-    _stuff = logdensity_and_stuff(source, draw)
+    _stuff = lpdf_and_invariants(source, draw)
     tinfo = info(target)
     # sxic = draw[4:end]
     # lsds = HSGPs.log_sds(source, draw)

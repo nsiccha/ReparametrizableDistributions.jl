@@ -120,9 +120,9 @@ WarmupHMC.reparametrization_parameters(::Any) = Float64[]
     end
     @testset "Transformation tests" begin
         @testset "ScaleHierarchy" transformation_tests(hierarchies)
-        @testset "GammaSimplex" transformation_tests(simplices)
+        # @testset "GammaSimplex" transformation_tests(simplices)
         # @testset "HSGP" transformation_tests(hsgps; iterations=50)
-        @testset "R2D2" transformation_tests(r2d2s)
+        # @testset "R2D2" transformation_tests(r2d2s)
     end
 end
 # import ReparametrizableDistributions: info

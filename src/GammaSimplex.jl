@@ -22,7 +22,7 @@ _quantile(distribution, x) = quantile(distribution, x)
 _logcdf(distribution, x) = logcdf(distribution, x)
 _invlogcdf(distribution, x) = invlogcdf(distribution, x)
 
-logdensity_and_stuff(source::GammaSimplex, draw::AbstractVector, lpdf=0.) = begin 
+lpdf_and_invariants(source::GammaSimplex, draw::NamedTuple, lpdf=0.) = begin 
     _info = info(source)
     # _views = views(source, draw)
     unnormalized_weights = _invlogcdf.(_info.parametrization_gammas, _logcdf.(Normal(), draw)) 
@@ -33,10 +33,10 @@ logdensity_and_stuff(source::GammaSimplex, draw::AbstractVector, lpdf=0.) = begi
     (;lpdf, unnormalized_weights, weights)
 end
 
-lja_reparametrize(source::GammaSimplex, target::GammaSimplex, draw::AbstractVector, lja=0.) = begin 
+lja_reparametrize(source::GammaSimplex, target::GammaSimplex, draw::NamedTuple, lja=0.) = begin 
     _info = info(source)
     tinfo = info(target)
-    sxi = _invlogcdf.(_info.parametrization_gammas, _logcdf.(Normal(), draw))
+    sxi = draw.unnormalized_weights#_invlogcdf.(_info.parametrization_gammas, _logcdf.(Normal(), draw))
     ssum = sum(sxi)
     tsum = _invlogcdf(tinfo.sum_gamma, _logcdf(_info.sum_gamma, ssum))
     txi = sxi .* tsum ./ ssum

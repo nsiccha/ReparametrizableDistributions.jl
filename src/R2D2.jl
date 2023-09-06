@@ -6,36 +6,36 @@ reparametrize(source::R2D2, parameters::NamedTuple) = R2D2(
     map(reparametrize, info(source), parameters)...
 )
 
-logdensity_and_stuff(source::R2D2, draw::AbstractVector, lpdf=0.) = begin
-    _info, _views = info_and_views(source, draw)
-    sigma = exp.(_views.log_sigma)
-    tau = _views.R2 ./ (1 .- _views.R2)
-    simplex = logdensity_and_stuff(_info.simplex, _views.simplex)
+lpdf_and_invariants(source::R2D2, draw::NamedTuple, lpdf=0.) = begin
+    _info = info(source)
+    sigma = exp.(draw.log_sigma)
+    tau = draw.R2 ./ (1 .- draw.R2)
+    simplex = lpdf_and_invariants(_info.simplex, draw.simplex)
     scales = (sigma.*tau) .* sqrt.(simplex.weights)
     prior_hierarchy = Normal(0, scales .^ _centeredness)
-    hierarchy_lpdf = sum_logpdf(prior_hierarchy, _views.hierarchy)
-    hierarchy = scales .^ (1 .- _centeredness) .* _views.hierarchy
+    hierarchy_lpdf = sum_logpdf(prior_hierarchy, draw.hierarchy)
+    hierarchy = scales .^ (1 .- _centeredness) .* draw.hierarchy
     lpdf += simplex.lpdf
     lpdf += hierarchy_lpdf
-    (;lpdf, simplex, sigma, tau, scales, hierarchy)
+    (;lpdf, draw.log_sigma, draw.R2, sigma, tau, simplex, scales, hierarchy)
 end
 
-lja_reparametrize(source::R2D2, target::R2D2, draw::AbstractVector, lja=0.) = begin
-    _info, _views = info_and_views(source, draw)
+lja_reparametrize(source::R2D2, target::R2D2, draw::NamedTuple, lja=0.) = begin
+    _info = info(source)
     _centeredness = info(_info.hierarchy).centeredness
-    sigma = exp.(_views.log_sigma)
-    tau = exp.(_views.R2)# ./ (1 .- _views.R2)
-    simplex = logdensity_and_stuff(_info.simplex, _views.simplex)
+    sigma = exp.(draw.log_sigma)
+    tau = exp.(draw.R2)# ./ (1 .- draw.R2)
+    simplex = lpdf_and_invariants(_info.simplex, draw.simplex)
     scales = (sigma .* tau) .* sqrt.(simplex.weights)
 
     tinfo = info(target)
     tcenteredness = info(tinfo.hierarchy).centeredness
-    lja_simplex, tdraw_simplex = lja_reparametrize(_info.simplex, tinfo.simplex, _views.simplex)
+    lja_simplex, tdraw_simplex = lja_reparametrize(_info.simplex, tinfo.simplex, draw.simplex)
     tprior_hierarchy = Normal.(0., scales .^ tcenteredness)
-    tdraw_hierarchy = _views.hierarchy .* scales .^ (tcenteredness .- _centeredness)
+    tdraw_hierarchy = draw.hierarchy .* scales .^ (tcenteredness .- _centeredness)
     lja_hierarchy = sum_logpdf(tprior_hierarchy, tdraw_hierarchy)
     lja += lja_simplex 
     lja += lja_hierarchy
-    tdraw = vcat(_views.log_sigma, _views.R2, tdraw_simplex, tdraw_hierarchy)
+    tdraw = vcat(draw.log_sigma, draw.R2, tdraw_simplex, tdraw_hierarchy)
     lja, tdraw
 end

@@ -4,7 +4,7 @@ export ScaleHierarchy, GammaSimplex, HSGP, R2D2
 
 using WarmupHMC, Distributions, LogDensityProblems, LogExpFunctions
 
-import WarmupHMC: reparametrization_parameters, unconstrained_reparametrization_parameters, reparametrize, unconstrained_reparametrize, logdensity_and_stuff, lja_reparametrize
+import WarmupHMC: reparametrization_parameters, unconstrained_reparametrization_parameters, reparametrize, unconstrained_reparametrize, lpdf_and_invariants, lja_reparametrize
 
 include("StackedVector.jl")
 include("AbstractReparametrizableDistribution.jl")
