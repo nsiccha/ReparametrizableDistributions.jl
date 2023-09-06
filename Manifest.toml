@@ -384,7 +384,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[deps.WarmupHMC]]
 deps = ["Distributions", "DynamicObjects", "LinearAlgebra", "LogDensityProblems", "Random", "UnPack"]
-git-tree-sha1 = "71357d3f838563b5e17406d10e7f53383e375fc2"
+git-tree-sha1 = "46384ed34bebd9cc01ac010b80e268a8442db29d"
 repo-rev = "main"
 repo-url = "https://github.com/nsiccha/WarmupHMC.jl"
 uuid = "60658175-6863-4866-a322-ab51a11c0cfe"

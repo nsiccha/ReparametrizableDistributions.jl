@@ -11,10 +11,10 @@ GammaSimplex(target::Dirichlet, parametrization::Dirichlet) = GammaSimplex((
     parametrization_gammas=Gamma.(parametrization.alpha),
     sum_gamma=Gamma(sum(parametrization.alpha)),
 ))
-Base.length(source::GammaSimplex) = length(info(source).target_distribution)
-reparametrization_parameters(source::GammaSimplex) = log.(info(source).parametrization_distribution.alpha)
+length_info(source::GammaSimplex) = Length((xi=length(source.info.target_distribution),))
+reparametrization_parameters(source::GammaSimplex) = log.(source.info.parametrization_distribution.alpha)
 reparametrize(source::GammaSimplex, parameters::AbstractVector) = GammaSimplex(
-    info(source).target_distribution, Dirichlet(exp.(parameters))
+    source.info.target_distribution, Dirichlet(exp.(parameters))
 )
 
 _cdf(distribution, x) = cdf(distribution, x)
@@ -25,18 +25,18 @@ _invlogcdf(distribution, x) = invlogcdf(distribution, x)
 lpdf_and_invariants(source::GammaSimplex, draw::NamedTuple, lpdf=0.) = begin 
     _info = info(source)
     # _views = views(source, draw)
-    unnormalized_weights = _invlogcdf.(_info.parametrization_gammas, _logcdf.(Normal(), draw)) 
+    unnormalized_weights = _invlogcdf.(_info.parametrization_gammas, _logcdf.(Normal(), draw.xi)) 
     weights = unnormalized_weights ./ sum(unnormalized_weights)
-    lpdf += sum(logpdf.(Normal(), draw)) 
+    lpdf += sum_logpdf(Normal(), draw.xi) 
     lpdf += logpdf(_info.target_distribution, weights) 
     lpdf -= logpdf(_info.parametrization_distribution, weights)
     (;lpdf, unnormalized_weights, weights)
 end
 
-lja_reparametrize(source::GammaSimplex, target::GammaSimplex, draw::NamedTuple, lja=0.) = begin 
+lja_reparametrize(source::GammaSimplex, target::GammaSimplex, invariants::NamedTuple, lja=0.) = begin 
     _info = info(source)
     tinfo = info(target)
-    sxi = draw.unnormalized_weights#_invlogcdf.(_info.parametrization_gammas, _logcdf.(Normal(), draw))
+    sxi = invariants.unnormalized_weights#_invlogcdf.(_info.parametrization_gammas, _logcdf.(Normal(), draw))
     ssum = sum(sxi)
     tsum = _invlogcdf(tinfo.sum_gamma, _logcdf(_info.sum_gamma, ssum))
     txi = sxi .* tsum ./ ssum
