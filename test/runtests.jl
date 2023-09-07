@@ -1,9 +1,9 @@
 # using TestEnv; TestEnv.activate("ReparametrizableDistributions");
-using WarmupHMC, ReparametrizableDistributions, ReverseDiff, Distributions, Random, Test, Optim, ChainRulesTestUtils
+using WarmupHMC, ReparametrizableDistributions, ReverseDiff, Distributions, Random, Test, Optim, ChainRulesTestUtils, NaNStatistics, Plots
 
 import ReparametrizableDistributions: _logcdf, _invlogcdf
 
-rmse(x,y; m=mean) = sqrt(m((x.-y).^2))
+rmse(x,y; m=nanmean) = sqrt(m((x.-y).^2))
 pairwise(f, arg, args...; kwargs...) = [
     f(lhs, rhs, args...; kwargs...) for lhs in arg, rhs in arg
 ]
@@ -20,6 +20,7 @@ reparametrization_test(lhs, rhs, tol=1e-4) = begin
     parameters = WarmupHMC.reparametrization_parameters.([lhs, rhs])
     rlhs = WarmupHMC.reparametrize(lhs, parameters[2])
     lrlhs = WarmupHMC.reparametrize(rlhs, parameters[1])
+    @test rmse(parameters[2], WarmupHMC.reparametrization_parameters(rlhs)) <= tol
     @test rmse(parameters[1], WarmupHMC.reparametrization_parameters(lrlhs)) <= tol
 end
 count_nan(x) = sum(map(count_nan, x))
@@ -70,16 +71,16 @@ end
 
 
 rng = Xoshiro(0)
+n_parametrizations = 12
 n_parameters = 4
 n_draws = 100
 # xi = randn(rng, (n_parameters, n_draws))
-cs = [1, sqrt(10), 10]#, 100]
-scales = [0, 1, 2]
+cs = exp.(randn(rng, n_parametrizations))
+scales = exp.(randn(rng, n_parametrizations))
 
 concentrations = [
     c .* exp.(scale .* randn(rng, n_parameters))
-    for c in cs
-    for scale in scales
+    for (c, scale) in zip(cs, scales)
 ]
 
 hierarchies = [
@@ -102,7 +103,13 @@ r2d2s = [
 
 n_functions = 3
 hsgps = [
-    HSGP(MeanShift(Normal(), randn(rng, n_functions)), Normal(), Normal(), ScaleHierarchy([], rand(rng, n_functions)))
+    HSGP(
+        MeanShift(Normal(), randn(rng, n_functions)), 
+        Normal(), 
+        Normal(), 
+        # ScaleHierarchy([], 1e-3.+zeros(n_functions))
+        ScaleHierarchy([], rand(rng, n_functions))
+    )
     for concentration in concentrations
 ]
 
@@ -118,10 +125,29 @@ WarmupHMC.reparametrization_parameters(::Any) = Float64[]
         # @testset "MeanShift" transformation_tests(mean_shifts)
         # @testset "GammaSimplex" transformation_tests(simplices)
         # @testset "R2D2" transformation_tests(r2d2s)
-        @testset "HSGP" pairwise(nan_test, hsgps)
-        # @testset "HSGP" transformation_tests(hsgps; iterations=50)
+        @testset "HSGP" transformation_tests(hsgps, (test_draws(source)); iterations=50)
     end
 end
-# import ReparametrizableDistributions: StackedVector
 
-# WarmupHMC.lpdf_and_invariants(hsgps[1], randn(rng, length(hsgps[1]))) |> count_nan
+loss_matrix(parametrizations) = begin
+    draws = (test_draws(parametrizations[1]))
+    rv = pairwise(parametrizations) do lhs, rhs
+        parameters = WarmupHMC.reparametrization_parameters(rhs)
+        loss = WarmupHMC.reparametrization_loss_function(lhs, draws)
+        loss(parameters)
+    end
+    rv .-= diag(rv)
+    rv
+end
+diff_matrix(parametrizations) = pairwise(parametrizations) do lhs, rhs
+    rmse(WarmupHMC.reparametrization_parameters.((lhs, rhs))...)
+end
+scatter_matrix(parametrizations) = begin 
+    draws = test_draws(parametrizations[1], n_draws=1000)
+    pairwise(parametrizations) do lhs, rhs
+        rdraws = WarmupHMC.reparametrize(lhs, rhs, draws)
+        scatter(rdraws[1,:], rdraws[2,:])
+    end
+end
+plot(scatter_matrix(mean_shifts[1:4])..., size=(1600, 1600))
+loss_matrix(mean_shifts)

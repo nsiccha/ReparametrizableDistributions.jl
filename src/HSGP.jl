@@ -11,9 +11,12 @@ hsgp_extra(;n_functions::Integer=32, boundary_factor::Real=1.5) = begin
     idxs = 1:n_functions
     # alpha * sqrt(sqrt(2*pi()) * rho) * exp(-0.25*(rho*pi()/2/L)^2 * linspaced_vector(M, 1, M)^2);
     pre_eig = (-.25 * (pi/2/boundary_factor)^2) .* idxs .^ 2
-    (;pre_eig, mean_shift=zeros(n_functions))
+    (;pre_eig)
 end
 length_info(source::HSGP) = Length((intercept=1, log_sd=1, log_lengthscale=1, hierarchy=length(source.info.hierarchy)))
+reparametrize(source::HSGP, parameters::NamedTuple) = HSGP(
+    map(reparametrize, info(source), parameters)
+)
 
 # # https://github.com/avehtari/casestudies/blob/967cdb3a6432e8985886b96fda306645fe156a29/Motorcycle/gpbasisfun_functions.stan#L12-L14
 # HSGP(hyperprior::AbstractVector, x::AbstractVector, n_functions::Integer=32, boundary_factor::Real=1.5, centeredness=zeros(n_functions), mean_shift=zeros(n_functions)) = begin 
@@ -54,12 +57,12 @@ end
     lja += lja_intercept
     lja += lja_hierarchy
     tdraw = vcat(views(tdraw_intercept).intercept, invariants.log_sd, invariants.log_lengthscale, views(tdraw_hierarchy).xic)
-    if sum(isnan.(tdraw))> 0
-        println(invariants)
-        println(tinfo)
-        println((;views(tdraw_intercept).intercept, invariants.log_sd, invariants.log_lengthscale, views(tdraw_hierarchy).xic))
-        # println(views(tdraw_hierarchy))
-        # println((tdraw, isnan.(tdraw)))
-    end 
+    # if sum(isnan.(tdraw))> 0
+    #     println(invariants)
+    #     println(tinfo)
+    #     println((;views(tdraw_intercept).intercept, invariants.log_sd, invariants.log_lengthscale, views(tdraw_hierarchy).xic))
+    #     # println(views(tdraw_hierarchy))
+    #     # println((tdraw, isnan.(tdraw)))
+    # end 
     lja, tdraw
 end
