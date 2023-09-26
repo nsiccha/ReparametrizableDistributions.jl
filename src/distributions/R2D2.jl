@@ -17,6 +17,8 @@ lpdf_and_invariants(source::R2D2, draw::NamedTuple, lpdf=0.) = begin
     # prior_hierarchy = Normal.(0, scales .^ _centeredness)
     # hierarchy_lpdf = sum_logpdf(prior_hierarchy, draw.hierarchy)
     # hierarchy = scales .^ (1 .- _centeredness) .* draw.hierarchy
+    lpdf += sum_logpdf(_info.log_sigma, draw.log_sigma)
+    lpdf += sum_logpdf(_info.R2, draw.R2)
     lpdf += simplex.lpdf
     lpdf += hierarchy.lpdf
     (;lpdf, draw.log_sigma, draw.R2, sigma, tau, simplex, hierarchy)

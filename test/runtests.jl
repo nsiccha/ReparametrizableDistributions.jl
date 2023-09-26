@@ -1,5 +1,6 @@
-# using TestEnv; TestEnv.activate("ReparametrizableDistributions");
-using WarmupHMC, ReparametrizableDistributions, ReverseDiff, Distributions, Random, Test, Optim, ChainRulesTestUtils, NaNStatistics, Plots
+using TestEnv; TestEnv.activate("ReparametrizableDistributions");
+using WarmupHMC, ReparametrizableDistributions, ReverseDiff, Distributions, Random, Test, Optim, ChainRulesTestUtils, NaNStatistics, Plots, LinearAlgebra, DynamicPlots
+using DynamicHMC, LogDensityProblemsAD
 
 import ReparametrizableDistributions: _logcdf, _invlogcdf
 
@@ -15,7 +16,7 @@ transformation_tests(parametrizations, args...; kwargs...) = begin
     @testset "easy_convergence" pairwise(easy_convergence_test, parametrizations, args...)
     @testset "hard_convergence" pairwise(hard_convergence_test, parametrizations, args...; kwargs...)
 end 
-test_draws(lhs; seed=0, n_draws=100) = randn(Xoshiro(seed), (length(lhs), n_draws))
+test_draws(lhs; seed=0, rng=Xoshiro(seed), n_draws=100) = randn(rng, (length(lhs), n_draws))
 reparametrization_test(lhs, rhs, tol=1e-4) = begin 
     parameters = WarmupHMC.reparametrization_parameters.([lhs, rhs])
     rlhs = WarmupHMC.reparametrize(lhs, parameters[2])
@@ -92,12 +93,12 @@ mean_shifts = [
     for concentration in concentrations
 ]
 simplices = [
-    GammaSimplex(Dirichlet(concentration))
+    GammaSimplex(Dirichlet(ones(length(concentration))), Dirichlet(concentration))
     for concentration in concentrations
 ]
 
 r2d2s = [
-    R2D2(0, 0, rand(rng, simplices), ScaleHierarchy([], rand(rng, n_parameters)))
+    R2D2(Normal(), Normal(), rand(rng, simplices), ScaleHierarchy([], rand(rng, n_parameters)))
     for concentration in concentrations
 ]
 
@@ -113,21 +114,102 @@ hsgps = [
     for concentration in concentrations
 ]
 
+# Directional = ReparametrizableDistributions.Directional
+
+test_draws(lhs::Directional; seed=0, rng=Xoshiro(seed), n_draws=100) = begin
+    # return randn(rng, (length(lhs), n_draws))
+    location = randn(rng, length(lhs))
+    # location .*= (median(lhs.info.radius)) / norm(location)
+    location .*= sqrt(median(lhs.info.radius_squared)) / norm(location)
+    location .+ randn(rng, (length(lhs), n_draws))
+end
+directionals2 = [
+    Directional(2, exp(4 + 4 * randn(rng)))
+    for _ in 1:8
+]
+# directionals2 = Directional.(2, exp.(3 .+ 2 .* randn(rng, 8)))
+# directionals4 = Directional.(4, exp.(randn(rng, length(concentrations))))
+
+plots = broadcast(directionals2, reshape(directionals2, (1,:))) do lhs, rhs 
+    println("====================")
+    d0 = Directional(2, 0)
+    @time draws = test_draws(lhs, rng=rng)
+    @time parameters = WarmupHMC.reparametrization_parameters.([lhs, rhs])
+    @time loss = WarmupHMC.reparametrization_loss_function(lhs, draws)
+    @time lloss, rloss = loss.(parameters)
+    @time rdraws = WarmupHMC.reparametrize(lhs, rhs, draws)
+    @time zdraws = WarmupHMC.reparametrize(lhs, d0, draws)
+    # rdraws = test_draws(rhs, rng=rng)
+    @time Scatter(eachrow(draws)..., label=lloss) + Scatter(eachrow(rdraws)..., label=rloss) + Scatter(eachrow(zdraws)..., label=loss([-Inf])) + Scatter([0], [0], color=:black)
+    # println("====================")
+    # scatter!(p, eachrow(tdraws)...)
+end
+Figure(plots)
+
 WarmupHMC.reparametrization_parameters(::Any) = Float64[]
+import LogDensityProblemsAD: ADGradientWrapper
+WarmupHMC.lja_reparametrize(source::ADGradientWrapper, target::ADGradientWrapper, draw::AbstractVector) = begin 
+    WarmupHMC.lja_reparametrize(parent(source), parent(target), draw)
+end
+WarmupHMC.find_reparametrization(source::ADGradientWrapper, draws::AbstractMatrix) = begin
+    rv = ADgradient(
+        :ReverseDiff, 
+        WarmupHMC.find_reparametrization(:ReverseDiff, parent(source), draws, verbose=true, iterations=50)
+    )
+    println([
+        WarmupHMC.reparametrization_parameters(parent(source)),
+        WarmupHMC.reparametrization_parameters(parent(rv)),
+    ])
+    return rv
+end
+
+using WarmupHMC, Optim, ReverseDiff
+WarmupHMC.find_reparametrization(::Val{:ReverseDiff}, source, draws::AbstractMatrix; iterations=5, method=LBFGS(), verbose=false) = begin 
+    loss = WarmupHMC.reparametrization_loss_function(source, draws)
+    init_arg = WarmupHMC.reparametrization_parameters(source)
+    # loss_tape = ReverseDiff.compile(ReverseDiff.GradientTape(loss, init_arg))
+    loss_g!(g, arg) = ReverseDiff.gradient!(g, loss, arg)
+    optimization_result = optimize(
+        loss, loss_g!, init_arg, method, 
+        Optim.Options(iterations=iterations)
+    )
+    verbose && display(optimization_result)
+    WarmupHMC.reparametrize(source, Optim.minimizer(optimization_result))
+end
+
 @testset "All Tests" begin
-    gammas = Gamma.(exp.(randn(rng, 100)), exp.(randn(rng, 100)))
-    qs = rand(rng, 100)
+    n_sensitivity_tests = 10
+    gammas = Gamma.(exp.(randn(rng, n_sensitivity_tests)), exp.(randn(rng, n_sensitivity_tests)))
+    ncss = NoncentralChisq.(exp.(randn(rng, n_sensitivity_tests)), exp.(randn(rng, n_sensitivity_tests)))
+    qs = rand(rng, n_sensitivity_tests)
     @testset "Sensitivities" begin
         # @testset "Gamma" sensitivity_tests(gammas, qs)
+        # @testset "NoncentralChisq" sensitivity_tests(ncss, qs)
     end
     @testset "Transformation tests" begin
         # @testset "ScaleHierarchy" transformation_tests(hierarchies)
         # @testset "MeanShift" transformation_tests(mean_shifts)
         # @testset "GammaSimplex" transformation_tests(simplices)
         # @testset "R2D2" transformation_tests(r2d2s)
-        @testset "HSGP" transformation_tests(hsgps, (test_draws(source)); iterations=50)
+        # @testset "HSGP" transformation_tests(hsgps, (test_draws(hsgps[1])); iterations=50)
+        # @testset "Directionals2" transformation_tests(directionals2)
+        # @testset "Directionals4" transformation_tests(directionals4)
+    end
+    @testset "DynamicHMC" begin 
+        # mcmc_with_warmup(rng, ADgradient(:ReverseDiff, directionals2[1]), 1000)
     end
 end
+
+
+mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, directionals2[6]), 1000, reporter=NoProgressReport()).final_reparametrization_state.reparametrization |> parent |> WarmupHMC.reparametrization_parameters
+
+mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, hierarchies[1]), 1000, reporter=NoProgressReport()).final_reparametrization_state.reparametrization |> parent |> WarmupHMC.reparametrization_parameters
+
+mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, simplices[4]), 1000, reporter=NoProgressReport()).final_reparametrization_state.reparametrization |> parent |> WarmupHMC.reparametrization_parameters
+
+mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, hsgps[1]), 1000, reporter=NoProgressReport()).final_reparametrization_state.reparametrization |> parent |> WarmupHMC.reparametrization_parameters
+
+mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, r2d2s[1]), 1000, reporter=NoProgressReport())
 
 loss_matrix(parametrizations) = begin
     draws = (test_draws(parametrizations[1]))
