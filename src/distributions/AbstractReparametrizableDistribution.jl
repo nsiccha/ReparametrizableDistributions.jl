@@ -3,7 +3,12 @@ abstract type AbstractReparametrizableDistribution <: ContinuousMultivariateDist
 Base.getproperty(source::T, key::Symbol) where {T<:AbstractReparametrizableDistribution} = hasfield(T, key) ? getfield(source, key) : getproperty(info(source), key)
 
 LogDensityProblems.dimension(source::AbstractReparametrizableDistribution) = length(source)
-LogDensityProblems.logdensity(source::AbstractReparametrizableDistribution, draw::AbstractVector) = WarmupHMC.lpdf_and_invariants(source, draw).lpdf
+LogDensityProblems.logdensity(source::AbstractReparametrizableDistribution, draw::AbstractVector) = try 
+    WarmupHMC.lpdf_and_invariants(source, draw).lpdf
+catch e
+    @debug e
+    -Inf
+end
 
 default_info(::AbstractReparametrizableDistribution) = NamedTuple()
 info(source::AbstractReparametrizableDistribution) = source.info#merge(default_info(source), source.info)
@@ -20,10 +25,13 @@ reparametrize(source::AbstractReparametrizableDistribution, parameters::Abstract
     source, views(_reparametrization_parameters(source), parameters)
 )
 lpdf_and_invariants(source::AbstractReparametrizableDistribution, draw::AbstractVector, lpdf=0.) = lpdf_and_invariants(source, views(source, draw), lpdf)
-lja_reparametrize(source::AbstractReparametrizableDistribution, target::AbstractReparametrizableDistribution, draw::AbstractVector, lja=0.) = begin 
+lja_reparametrize(source::AbstractReparametrizableDistribution, target::AbstractReparametrizableDistribution, draw::AbstractVector, lja=0.) = try 
     lja, tdraw = lja_reparametrize(source, target, lpdf_and_invariants(source, draw), lja)
     lja, collect(tdraw)
-end 
+catch e
+    @debug e
+    NaN, NaN .* draw
+end
 # Base.isapprox(lhs::AbstractReparametrizableDistribution, rhs::AbstractReparametrizableDistribution) = begin 
 #     linfo, rinfo = info.((lhs, rhs))
 #     keys(linfo) == keys(rinfo) && all(map(isapprox, linfo, rinfo))
