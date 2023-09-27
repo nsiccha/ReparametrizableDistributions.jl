@@ -130,52 +130,37 @@ directionals2 = [
 # directionals2 = Directional.(2, exp.(3 .+ 2 .* randn(rng, 8)))
 # directionals4 = Directional.(4, exp.(randn(rng, length(concentrations))))
 
-plots = broadcast(directionals2, reshape(directionals2, (1,:))) do lhs, rhs 
-    println("====================")
-    d0 = Directional(2, 0)
-    @time draws = test_draws(lhs, rng=rng)
-    @time parameters = WarmupHMC.reparametrization_parameters.([lhs, rhs])
-    @time loss = WarmupHMC.reparametrization_loss_function(lhs, draws)
-    @time lloss, rloss = loss.(parameters)
-    @time rdraws = WarmupHMC.reparametrize(lhs, rhs, draws)
-    @time zdraws = WarmupHMC.reparametrize(lhs, d0, draws)
-    # rdraws = test_draws(rhs, rng=rng)
-    @time Scatter(eachrow(draws)..., label=lloss) + Scatter(eachrow(rdraws)..., label=rloss) + Scatter(eachrow(zdraws)..., label=loss([-Inf])) + Scatter([0], [0], color=:black)
-    # println("====================")
-    # scatter!(p, eachrow(tdraws)...)
-end
-Figure(plots)
+# plots = broadcast(directionals2, reshape(directionals2, (1,:))) do lhs, rhs 
+#     println("====================")
+#     d0 = Directional(2, 0)
+#     @time draws = test_draws(lhs, rng=rng)
+#     @time parameters = WarmupHMC.reparametrization_parameters.([lhs, rhs])
+#     @time loss = WarmupHMC.reparametrization_loss_function(lhs, draws)
+#     @time lloss, rloss = loss.(parameters)
+#     @time rdraws = WarmupHMC.reparametrize(lhs, rhs, draws)
+#     @time zdraws = WarmupHMC.reparametrize(lhs, d0, draws)
+#     # rdraws = test_draws(rhs, rng=rng)
+#     @time Scatter(eachrow(draws)..., label=lloss) + Scatter(eachrow(rdraws)..., label=rloss) + Scatter(eachrow(zdraws)..., label=loss([-Inf])) + Scatter([0], [0], color=:black)
+#     # println("====================")
+#     # scatter!(p, eachrow(tdraws)...)
+# end
+# Figure(plots)
 
-WarmupHMC.reparametrization_parameters(::Any) = Float64[]
-import LogDensityProblemsAD: ADGradientWrapper
-WarmupHMC.lja_reparametrize(source::ADGradientWrapper, target::ADGradientWrapper, draw::AbstractVector) = begin 
-    WarmupHMC.lja_reparametrize(parent(source), parent(target), draw)
-end
-WarmupHMC.find_reparametrization(source::ADGradientWrapper, draws::AbstractMatrix) = begin
-    rv = ADgradient(
-        :ReverseDiff, 
-        WarmupHMC.find_reparametrization(:ReverseDiff, parent(source), draws, verbose=true, iterations=50)
-    )
-    println([
-        WarmupHMC.reparametrization_parameters(parent(source)),
-        WarmupHMC.reparametrization_parameters(parent(rv)),
-    ])
-    return rv
-end
+# WarmupHMC.reparametrize(source::ADGradientWrapper, )
 
-using WarmupHMC, Optim, ReverseDiff
-WarmupHMC.find_reparametrization(::Val{:ReverseDiff}, source, draws::AbstractMatrix; iterations=5, method=LBFGS(), verbose=false) = begin 
-    loss = WarmupHMC.reparametrization_loss_function(source, draws)
-    init_arg = WarmupHMC.reparametrization_parameters(source)
-    # loss_tape = ReverseDiff.compile(ReverseDiff.GradientTape(loss, init_arg))
-    loss_g!(g, arg) = ReverseDiff.gradient!(g, loss, arg)
-    optimization_result = optimize(
-        loss, loss_g!, init_arg, method, 
-        Optim.Options(iterations=iterations)
-    )
-    verbose && display(optimization_result)
-    WarmupHMC.reparametrize(source, Optim.minimizer(optimization_result))
-end
+# using WarmupHMC, Optim, ReverseDiff
+# WarmupHMC.find_reparametrization(::Val{:ReverseDiff}, source, draws::AbstractMatrix; iterations=5, method=LBFGS(), verbose=false) = begin 
+#     loss = WarmupHMC.reparametrization_loss_function(source, draws)
+#     init_arg = WarmupHMC.reparametrization_parameters(source)
+#     # loss_tape = ReverseDiff.compile(ReverseDiff.GradientTape(loss, init_arg))
+#     loss_g!(g, arg) = ReverseDiff.gradient!(g, loss, arg)
+#     optimization_result = optimize(
+#         loss, loss_g!, init_arg, method, 
+#         Optim.Options(iterations=iterations)
+#     )
+#     verbose && display(optimization_result)
+#     WarmupHMC.reparametrize(source, Optim.minimizer(optimization_result))
+# end
 
 @testset "All Tests" begin
     n_sensitivity_tests = 10
@@ -201,15 +186,20 @@ end
 end
 
 
-mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, directionals2[6]), 1000, reporter=NoProgressReport()).final_reparametrization_state.reparametrization |> parent |> WarmupHMC.reparametrization_parameters
+mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, directionals2[6]), 1000).final_reparametrization_state.reparametrization |> parent |> WarmupHMC.reparametrization_parameters
 
-mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, hierarchies[1]), 1000, reporter=NoProgressReport()).final_reparametrization_state.reparametrization |> parent |> WarmupHMC.reparametrization_parameters
+WarmupHMC.mcmc_keep_reparametrization(
+    rng, ADgradient(:ReverseDiff, directionals2[6]), 1000
+)
 
-mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, simplices[4]), 1000, reporter=NoProgressReport()).final_reparametrization_state.reparametrization |> parent |> WarmupHMC.reparametrization_parameters
+mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, hierarchies[1]), 1000).final_reparametrization_state.reparametrization |> parent |> WarmupHMC.reparametrization_parameters
 
-mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, hsgps[1]), 1000, reporter=NoProgressReport()).final_reparametrization_state.reparametrization |> parent |> WarmupHMC.reparametrization_parameters
+mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, simplices[1]), 1000).final_reparametrization_state.reparametrization |> parent |> WarmupHMC.reparametrization_parameters
 
-mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, r2d2s[1]), 1000, reporter=NoProgressReport())
+mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, hsgps[1]), 1000)
+
+WarmupHMC.reparametrization_parameters(::Any) = Float64[]
+mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, r2d2s[1]), 1000)
 
 loss_matrix(parametrizations) = begin
     draws = (test_draws(parametrizations[1]))
@@ -231,5 +221,35 @@ scatter_matrix(parametrizations) = begin
         scatter(rdraws[1,:], rdraws[2,:])
     end
 end
-plot(scatter_matrix(mean_shifts[1:4])..., size=(1600, 1600))
-loss_matrix(mean_shifts)
+# plot(scatter_matrix(mean_shifts[1:4])..., size=(1600, 1600))
+# loss_matrix(mean_shifts)
+
+LocScaleHierarchy = ReparametrizableDistributions.LocScaleHierarchy
+
+WarmupHMC.lpdf_and_invariants(source::UnivariateDistribution, draw::AbstractVector, lpdf=0.) = begin 
+    lpdf += sum(logpdf.(source, draw))
+    (;lpdf, draw)
+end
+
+WarmupHMC.lja_reparametrize(source::UnivariateDistribution, target::UnivariateDistribution, invariants::NamedTuple, lja=0.) = begin 
+    lja, invariants.draw
+end
+
+using Logging, LogDensityProblems
+debug_logger = ConsoleLogger(stderr, Logging.Debug)
+    
+with_logger(debug_logger) do
+    n = 8
+    post = heteroskedastic_gp(
+        rand(Uniform(-1,1), 10), missing,
+        1.5, randn(n), zeros(n), randn(n), zeros(n)
+    )
+    xi = randn(length(post))
+    xi |> display
+    WarmupHMC.lpdf_and_invariants(post, xi) |> display
+    WarmupHMC.lja_reparametrize(post, post, xi) |> display
+    rv = mcmc_with_reparametrization(rng, ADgradient(:ReverseDiff, post), 1000)
+    rv |> display
+    WarmupHMC.lpdf_and_invariants(post, rv.posterior_matrix[:, 1]) |> display
+end
+
