@@ -239,7 +239,7 @@ using Logging, LogDensityProblems
 debug_logger = ConsoleLogger(stderr, Logging.Debug)
     
 with_logger(debug_logger) do
-    n = 8
+    n = 16
     post = heteroskedastic_gp(
         rand(Uniform(-1,1), 10), missing,
         1.5, randn(n), zeros(n), randn(n), zeros(n)

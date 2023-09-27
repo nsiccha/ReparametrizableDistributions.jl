@@ -1,17 +1,19 @@
 struct Directional{I} <: AbstractReparametrizableDistribution
     info::I
 end
+
+finite_log(x, reg=1e-16) = log(x + reg)
+
 Directional(dimension, non_centrality) = Directional(
     (;
         dimension, 
         non_centrality,
-        # radius_squared=NoncentralChisq(dimension, non_centrality), 
-        # radius_squared=truncated(Normal(dimension+non_centrality, sqrt(2(dimension+2non_centrality))); lower=0)
-        radius_squared=truncated(Normal(non_centrality, 1); lower=0)
+        radius_squared=NoncentralChisq(dimension, non_centrality), 
+        # radius_squared=truncated(Normal(non_centrality, 1); lower=0)
     )
 )
 length_info(source::Directional) = Length((location=source.info.dimension,))
-reparametrization_parameters(source::Directional) = [log(source.info.non_centrality)]
+reparametrization_parameters(source::Directional) = [finite_log(source.info.non_centrality)]
 reparametrize(source::Directional, parameters::AbstractVector) = Directional(source.info.dimension, exp(parameters[1]))
 
 lpdf_and_invariants(source::Directional, draw::NamedTuple, lpdf=0.) = begin
