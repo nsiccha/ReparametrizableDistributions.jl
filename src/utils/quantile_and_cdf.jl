@@ -28,16 +28,20 @@ end
 
 _logpdf(distribution::NoncentralChisq, x::Real) = begin
     k, lambda = distribution.ν, distribution.λ
-    try (
-        log(2) 
-        - (x+lambda)/2 
-        + (k/4-.5) * log(x/lambda) 
-        # + log(besseli(k/2-1, sqrt(lambda*x)))
-        + logbesseli(k/2-1, sqrt(lambda*x))
-    )
-    catch e
-        println(e)
-        -Inf
+    if lambda > 0
+        try (
+            log(2) 
+            - (x+lambda)/2 
+            + (k/4-.5) * log(x/lambda) 
+            # + log(besseli(k/2-1, sqrt(lambda*x)))
+            + logbesseli(k/2-1, sqrt(lambda*x))
+        )
+        catch e
+            println(e)
+            -Inf
+        end
+    else
+        logpdf(Chisq(k), x)
     end
 end
 
