@@ -1,7 +1,10 @@
 struct GammaSimplex{I} <: AbstractReparametrizableDistribution
     info::I
 end
-GammaSimplex(concentration::AbstractVector) = GammaSimplex(Dirichlet(concentration))
+GammaSimplex(target::AbstractVector) = GammaSimplex(Dirichlet(target))
+GammaSimplex(target::AbstractVector, parametrization::AbstractVector) = GammaSimplex(
+    Dirichlet(target), Dirichlet(parametrization)
+)
 GammaSimplex(target::Dirichlet) = GammaSimplex(target, target)
 GammaSimplex(target::Dirichlet, parametrization::Dirichlet) = GammaSimplex((
     target_distribution=target,
