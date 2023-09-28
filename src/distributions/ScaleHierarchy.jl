@@ -36,10 +36,11 @@ end
 struct LocScaleHierarchy{I} <: AbstractReparametrizableDistribution
     info::I
 end
-LocScaleHierarchy(location, log_scale, centeredness) = LocScaleHierarchy((;location, log_scale, centeredness))
-length_info(source::LocScaleHierarchy) = Length((location=length(source.info.location), log_scale=length(source.info.log_scale), xic=length(source.info.centeredness)))
-reparametrization_parameters(source::LocScaleHierarchy) = finite_logit.(source.info.centeredness)
-reparametrize(source::LocScaleHierarchy, parameters::AbstractVector) = LocScaleHierarchy(source.info.location, source.info.log_scale, logistic.(parameters))
+# LocScaleHierarchy(location, log_scale, centeredness) = LocScaleHierarchy((;location, log_scale, centeredness))
+LocScaleHierarchy(location, log_scale, c1, c2=c1) = LocScaleHierarchy((;location, log_scale, c1, c2))
+length_info(source::LocScaleHierarchy) = Length((location=length(source.info.location), log_scale=length(source.info.log_scale), xic=length(source.info.c1)))
+reparametrization_parameters(source::LocScaleHierarchy) = finite_logit.(vcat(source.info.c1, source.info.c2))
+reparametrize(source::LocScaleHierarchy, parameters::AbstractVector) = LocScaleHierarchy(source.info.location, source.info.log_scale, eachcol(reshape(logistic.(parameters), (:, 2)))...)
 
 lpdf_and_invariants(source::LocScaleHierarchy, draw::NamedTuple, lpdf=0.) = begin
     _info = info(source)
@@ -69,7 +70,7 @@ lja_reparametrize(::LocScaleHierarchy, target::LocScaleHierarchy, invariants::Na
     tinfo = info(target)
     txic = xexpy.(
         invariants.weights .- invariants.location,
-        -invariants.log_scale .* (1 .- tinfo.centeredness)
+        invariants.log_scale .* (tinfo.centeredness .- 1)
     ) .+ tinfo.centeredness .* invariants.location
     tdraw = StackedVector((;invariants.location, invariants.log_scale, xic=txic))
     prior_txic = Normal.(invariants.location .* tinfo.centeredness, exp.(invariants.log_scale .* tinfo.centeredness))
