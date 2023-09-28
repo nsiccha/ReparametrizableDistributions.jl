@@ -48,13 +48,13 @@ lpdf_and_invariants(source::LocScaleHierarchy, draw::NamedTuple, lpdf=0.) = begi
     # delta = decentered_value - centered * fn.loc
     # value = fn.loc + jnp.power(fn.scale, 1 - centered) * delta
     weights = draw.location .+ xexpy.(
-        draw.xic - _info.centeredness .* draw.location,
-        draw.log_scale .* (1 .- _info.centeredness)
+        draw.xic - _info.c1 .* draw.location,
+        draw.log_scale .* (1 .- _info.c2)
     )
     # Mirroring https://num.pyro.ai/en/stable/_modules/numpyro/infer/reparam.html#LocScaleReparam
     # params["loc"] = fn.loc * centered
     # params["scale"] = fn.scale**centered
-    prior_xic = Normal.(draw.location .* _info.centeredness, exp.(draw.log_scale .* _info.centeredness))
+    prior_xic = Normal.(draw.location .* _info.c1, exp.(draw.log_scale .* _info.c2))
     if length(_info.location) > 0
         lpdf += sum_logpdf(_info.location, draw.location)
     end
@@ -70,10 +70,10 @@ lja_reparametrize(::LocScaleHierarchy, target::LocScaleHierarchy, invariants::Na
     tinfo = info(target)
     txic = xexpy.(
         invariants.weights .- invariants.location,
-        invariants.log_scale .* (tinfo.centeredness .- 1)
-    ) .+ tinfo.centeredness .* invariants.location
+        invariants.log_scale .* (tinfo.c2 .- 1)
+    ) .+ tinfo.c1 .* invariants.location
     tdraw = StackedVector((;invariants.location, invariants.log_scale, xic=txic))
-    prior_txic = Normal.(invariants.location .* tinfo.centeredness, exp.(invariants.log_scale .* tinfo.centeredness))
+    prior_txic = Normal.(invariants.location .* tinfo.c1, exp.(invariants.log_scale .* tinfo.c2))
     lja += sum_logpdf(prior_txic, txic)
     lja, tdraw
 end
