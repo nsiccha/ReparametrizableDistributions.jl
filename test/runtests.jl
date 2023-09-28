@@ -169,7 +169,7 @@ directionals2 = [
     qs = rand(rng, n_sensitivity_tests)
     @testset "Sensitivities" begin
         # @testset "Gamma" sensitivity_tests(gammas, qs)
-        # @testset "NoncentralChisq" sensitivity_tests(ncss, qs)
+        @testset "NoncentralChisq" sensitivity_tests(ncss, qs)
     end
     @testset "Transformation tests" begin
         # @testset "ScaleHierarchy" transformation_tests(hierarchies)
