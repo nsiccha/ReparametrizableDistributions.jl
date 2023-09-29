@@ -1,6 +1,5 @@
 abstract type AbstractDirectional <: AbstractReparametrizableDistribution end
 
-finite_log(x, reg=1e-16) = log(x + reg)
 
 length_info(source::AbstractDirectional) = Length((location=source.info.dimension,))
 reparametrization_parameters(source::AbstractDirectional) = [finite_log(source.info.non_centrality)]

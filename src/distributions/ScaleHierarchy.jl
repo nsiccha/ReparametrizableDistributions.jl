@@ -2,7 +2,6 @@ struct ScaleHierarchy{I} <: AbstractReparametrizableDistribution
     info::I
 end
 
-finite_logit(x, reg=1e-4) = logit(.5 + (x-.5)*(1-reg))
 
 ScaleHierarchy(log_scale, centeredness) = ScaleHierarchy((;log_scale, centeredness))
 length_info(source::ScaleHierarchy) = Length((log_scale=length(source.info.log_scale), xic=length(source.info.centeredness)))
