@@ -24,7 +24,7 @@ length_info(source::AbstractReparametrizableDistribution) = info(source)
 reparametrization_info(source::AbstractReparametrizableDistribution) = info(source)
 # info_and_views(source::AbstractReparametrizableDistribution, draw::AbstractVector) = info(source), views(source, draw)
 Base.length(source::AbstractReparametrizableDistribution) = total_length(length_info(source))
-views(source::AbstractReparametrizableDistribution, draw::AbstractVector) = views(length_info(source), draw)
+views(source::AbstractReparametrizableDistribution, draw::AbstractArray) = views(length_info(source), draw)
 _reparametrization_parameters(source::AbstractReparametrizableDistribution) = StackedVector(
     map(reparametrization_parameters, reparametrization_info(source))
 )
@@ -57,11 +57,9 @@ import LogDensityProblemsAD: ADgradient, ADGradientWrapper
 WarmupHMC.reparametrize(::ADGradientWrapper, target::AbstractReparametrizableDistribution) = begin
     ADgradient(:ReverseDiff, target)
 end
+divide(source::Any, draws::AbstractMatrix) = (source, ), (draws, )
+recombine(sources::NTuple{1}) = sources[1]
 WarmupHMC.find_reparametrization(source::AbstractReparametrizableDistribution, draws::AbstractMatrix) = begin
-    rv = WarmupHMC.find_reparametrization(:ReverseDiff, source, draws, iterations=5)
-    @debug [
-        WarmupHMC.reparametrization_parameters(source),
-        WarmupHMC.reparametrization_parameters(rv),
-    ]
-    return rv
+    # WarmupHMC.find_reparametrization(:ReverseDiff, source, draws, iterations=5)
+    recombine(WarmupHMC.find_reparametrization.(:Optim, divide(source, draws)...))
 end

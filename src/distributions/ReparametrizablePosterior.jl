@@ -19,3 +19,10 @@ lja_reparametrize(source::ReparametrizablePosterior, target::ReparametrizablePos
     intermediates = values(map(lja_reparametrize, source.prior, target.prior, invariants.prior))
     sum(first.(intermediates)), vcat(last.(intermediates)...)
 end
+
+find_reparametrization(source::ReparametrizablePosterior, draws::AbstractMatrix) = begin
+    ReparametrizablePosterior(
+        source.likelihood,
+        map(find_reparametrization, source.prior, views(source, draws))
+    ) 
+end

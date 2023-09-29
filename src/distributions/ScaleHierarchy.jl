@@ -77,3 +77,20 @@ lja_reparametrize(::LocScaleHierarchy, target::LocScaleHierarchy, invariants::Na
     lja += sum_logpdf(prior_txic, txic)
     lja, tdraw
 end
+
+divide(source::LocScaleHierarchy, draws::AbstractMatrix) = begin 
+    subsources = [
+        LocScaleHierarchy(source.location, source.log_scale, [c1], [c2])
+        for (c1, c2) in zip(source.c1, source.c1)
+    ]
+    subdraws = [
+        vcat(draws[1:2,:], row') for row in eachrow(draws[3:end, :])
+    ]
+    subsources, subdraws
+end
+recombine(sources::Vector{<:LocScaleHierarchy}) = begin 
+    LocScaleHierarchy(
+        sources[1].location, sources[1].log_scale, 
+        vcat(getproperty.(sources, :c1)), vcat(getproperty.(sources, :c2))
+    )
+end

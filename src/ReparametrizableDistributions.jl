@@ -5,7 +5,7 @@ export LocScaleHierarchy, ScaleHierarchy, MeanShift, GammaSimplex, HSGP, R2D2, D
 using WarmupHMC, Distributions, LogDensityProblems, LogExpFunctions
 using SpecialFunctions, HypergeometricFunctions, ChainRulesCore
 
-import WarmupHMC: reparametrization_parameters, reparametrize, lpdf_and_invariants, lja_reparametrize
+import WarmupHMC: reparametrization_parameters, reparametrize, lpdf_and_invariants, lja_reparametrize, find_reparametrization
 
 include("utils/StackedVector.jl")
 include("utils/quantile_and_cdf.jl")
