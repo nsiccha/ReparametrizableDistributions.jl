@@ -91,6 +91,6 @@ end
 recombine(sources::Vector{<:LocScaleHierarchy}) = begin 
     LocScaleHierarchy(
         sources[1].location, sources[1].log_scale, 
-        vcat(getproperty.(sources, :c1)), vcat(getproperty.(sources, :c2))
+        vcat(getproperty.(sources, :c1)...), vcat(getproperty.(sources, :c2)...)
     )
 end
