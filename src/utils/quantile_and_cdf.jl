@@ -1,3 +1,5 @@
+sum_logpdf(dists, xs) = sum(logpdf.(dists, xs))
+
 _logpdf(distribution, x) = logpdf(distribution, x)
 _cdf(distribution, x) = cdf(distribution, x)
 _quantile(distribution, x) = quantile(distribution, x)
