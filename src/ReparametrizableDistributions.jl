@@ -8,6 +8,7 @@ using SpecialFunctions, HypergeometricFunctions, ChainRulesCore
 import WarmupHMC: reparametrization_parameters, reparametrize, lpdf_and_invariants, lja_reparametrize, find_reparametrization
 
 include("utils/StackedVector.jl")
+include("utils/finite_unconstraining.jl")
 include("utils/quantile_and_cdf.jl")
 include("distributions/AbstractReparametrizableDistribution.jl")
 include("distributions/ScaleHierarchy.jl")
