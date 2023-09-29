@@ -26,7 +26,7 @@ lja_reparametrize(::ScaleHierarchy, target::ScaleHierarchy, invariants::NamedTup
     tinfo = info(target)
     txic = xexpy.(invariants.weights, invariants.log_scale .* (tinfo.centeredness .- 1))
     # txic = xexpy.(invariants.xi, invariants.log_scale .* (tinfo.centeredness .- 0))
-    tdraw = StackedVector((;invariants.log_scale, xic=txic))
+    tdraw = StackedArray((;invariants.log_scale, xic=txic))
     prior_txic = Normal.(0., exp.(invariants.log_scale .* tinfo.centeredness))
     lja += sum_logpdf(prior_txic, txic)
     lja, tdraw
@@ -72,7 +72,8 @@ lja_reparametrize(::LocScaleHierarchy, target::LocScaleHierarchy, invariants::Na
         invariants.weights .- invariants.location,
         invariants.log_scale .* (tinfo.c2 .- 1)
     ) .+ tinfo.c1 .* invariants.location
-    tdraw = StackedVector((;invariants.location, invariants.log_scale, xic=txic))
+    tdraw = StackedArray((;invariants.location, invariants.log_scale, xic=txic))
+    # tdraw = vcat(invariants.location, invariants.log_scale, txic)
     prior_txic = Normal.(invariants.location .* tinfo.c1, exp.(invariants.log_scale .* tinfo.c2))
     lja += sum_logpdf(prior_txic, txic)
     lja, tdraw
