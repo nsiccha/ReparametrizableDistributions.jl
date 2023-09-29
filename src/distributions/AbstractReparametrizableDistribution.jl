@@ -25,7 +25,7 @@ reparametrization_info(source::AbstractReparametrizableDistribution) = info(sour
 # info_and_views(source::AbstractReparametrizableDistribution, draw::AbstractVector) = info(source), views(source, draw)
 Base.length(source::AbstractReparametrizableDistribution) = total_length(length_info(source))
 views(source::AbstractReparametrizableDistribution, draw::AbstractArray) = views(length_info(source), draw)
-_reparametrization_parameters(source::AbstractReparametrizableDistribution) = StackedVector(
+_reparametrization_parameters(source::AbstractReparametrizableDistribution) = StackedArray(
     map(reparametrization_parameters, reparametrization_info(source))
 )
 reparametrization_parameters(source::AbstractReparametrizableDistribution) = collect(_reparametrization_parameters(source))
