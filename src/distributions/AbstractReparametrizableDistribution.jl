@@ -59,7 +59,7 @@ WarmupHMC.reparametrize(::ADGradientWrapper, target::AbstractReparametrizableDis
 end
 divide(source::Any, draws::AbstractMatrix) = (source, ), (draws, )
 recombine(sources::NTuple{1}) = sources[1]
-WarmupHMC.find_reparametrization(source::AbstractReparametrizableDistribution, draws::AbstractMatrix) = begin
+WarmupHMC.find_reparametrization(source::AbstractReparametrizableDistribution, draws::AbstractMatrix; kwargs...) = begin
     # WarmupHMC.find_reparametrization(:ReverseDiff, source, draws, iterations=5)
-    recombine(WarmupHMC.find_reparametrization.(:Optim, divide(source, draws)...))
+    recombine(WarmupHMC.find_reparametrization.(:Optim, divide(source, draws)...; kwargs...))
 end
