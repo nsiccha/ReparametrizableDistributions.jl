@@ -4,6 +4,7 @@ authors = ["Nikolas Siccha <nikolas.siccha@aalto.fi>"]
 version = "0.1.0"
 
 [deps]
+BridgeStan = "c88b6f0a-829e-4b0b-94b7-f06ab5908f5a"
 ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 DynamicPlots = "a7562ee3-23e5-4f09-9cc3-be128489fa0b"
