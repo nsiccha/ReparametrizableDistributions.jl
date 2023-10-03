@@ -3,7 +3,8 @@ module ReparametrizableDistributions
 export LocScaleHierarchy, ScaleHierarchy, MeanShift, GammaSimplex, HSGP, R2D2, Directional, ReparametrizablePosterior, ReparametrizableBSLDP
 
 using WarmupHMC, Distributions, LogDensityProblems, LogExpFunctions
-using SpecialFunctions, HypergeometricFunctions, ChainRulesCore, BridgeStan
+using SpecialFunctions, HypergeometricFunctions, ChainRulesCore
+using BridgeStan, JSON
 
 import WarmupHMC: reparametrization_parameters, reparametrize, lpdf_and_invariants, lja_reparametrize, find_reparametrization
 
