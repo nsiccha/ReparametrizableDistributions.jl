@@ -2,7 +2,7 @@
 
 julia_version = "1.9.3"
 manifest_format = "2.0"
-project_hash = "6db1ac71962c440408e420e934e4ae425638a973"
+project_hash = "239547a16ebbfc9354e7667c3ef908e4acb4bce6"
 
 [[deps.Adapt]]
 deps = ["LinearAlgebra", "Requires"]
@@ -69,6 +69,12 @@ deps = ["Static"]
 git-tree-sha1 = "0c5f81f47bbbcf4aea7b2959135713459170798b"
 uuid = "62783981-4cbd-42fc-bca8-16325de8dc4b"
 version = "0.1.5"
+
+[[deps.BridgeStan]]
+deps = ["LazyArtifacts"]
+git-tree-sha1 = "26f49ceba65d8360a86d5d6bb71f2498b9115fae"
+uuid = "c88b6f0a-829e-4b0b-94b7-f06ab5908f5a"
+version = "2.2.1"
 
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -463,6 +469,10 @@ deps = ["ArrayInterface", "LinearAlgebra", "ManualMemory", "SIMDTypes", "Static"
 git-tree-sha1 = "88b8f66b604da079a627b6fb2860d3704a6729a1"
 uuid = "10f19ff3-798f-405d-979b-55457f8fc047"
 version = "0.1.14"
+
+[[deps.LazyArtifacts]]
+deps = ["Artifacts", "Pkg"]
+uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
