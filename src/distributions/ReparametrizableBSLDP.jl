@@ -26,6 +26,8 @@ end
 LogDensityProblems.logdensity_gradient_and_hessian(what::ReparametrizableBSLDP, x) = BridgeStan.log_density_hessian(what.posterior, x)
 
 Base.parent(what::ReparametrizableBSLDP) = what._posterior
+
+function update_dict end
 WarmupHMC.reparametrize(source::ReparametrizableBSLDP, target::AbstractReparametrizableDistribution) = begin
     data = merge(JSON.parse(source.posterior.data), update_dict(source.model_function, target))
     ReparametrizableBSLDP(
