@@ -58,3 +58,17 @@ NormalDirectional(dimension, non_centrality) = NormalDirectional(
     )
 )
 reparametrize(source::NormalDirectional, parameters::AbstractVector) = NormalDirectional(source.info.dimension, exp(parameters[1]))
+
+struct NormalDirectional{I} <: AbstractDirectional
+    info::I
+end
+
+NormalDirectional(dimension, c1, c2) = NormalDirectional(
+    (;
+        dimension, 
+        c1, c2,
+        radius_squared=truncated(Normal(c1, c2); lower=0)
+    )
+)
+reparametrization_parameters(source::AbstractDirectional) = finite_log.([source.info.c1, source.info.c2])
+reparametrize(source::NormalDirectional, parameters::AbstractVector) = NormalDirectional(source.info.dimension, exp.(parameters)...)
