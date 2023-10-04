@@ -35,7 +35,7 @@ reparametrize(source::AbstractReparametrizableDistribution, parameters::Abstract
 lpdf_and_invariants(source::AbstractReparametrizableDistribution, draw::AbstractVector, lpdf=0.) = lpdf_and_invariants(source, views(source, draw), lpdf)
 lja_reparametrize(source::AbstractReparametrizableDistribution, target::AbstractReparametrizableDistribution, draw::AbstractVector, lja=0.) = try 
     lja, tdraw = lja_reparametrize(source, target, lpdf_and_invariants(source, draw), lja)
-    !all(is_finite.(tdraw)) && println((;source, target, draw, lpdf_and_invariants=lpdf_and_invariants(source, draw), tdraw))
+    !all(isfinite.(tdraw)) && println((;source, target, draw, lpdf_and_invariants=lpdf_and_invariants(source, draw), tdraw))
     lja, collect(tdraw)
 catch e
     @debug exception_to_string(e)
