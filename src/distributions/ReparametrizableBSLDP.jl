@@ -19,12 +19,12 @@ ReparametrizableBSLDP(stan_file, model_function, data) = ReparametrizableBSLDP(
 LogDensityProblems.dimension(what::ReparametrizableBSLDP) = Int64(BridgeStan.param_unc_num(what.posterior))
 LogDensityProblems.capabilities(::Type{<:ReparametrizableBSLDP}) = LogDensityProblems.LogDensityOrder{2}()
 LogDensityProblems.logdensity(what::ReparametrizableBSLDP, x) = try 
-    BridgeStan.log_density(what.posterior, x)
+    BridgeStan.log_density(what.posterior, collect(x))
 catch e
     -Inf
 end
 LogDensityProblems.logdensity_and_gradient(source::ReparametrizableBSLDP, draw) = try 
-    BridgeStan.log_density_gradient(source.posterior, draw)
+    BridgeStan.log_density_gradient(source.posterior, collect(draw))
 catch e
     @warn """
 Failed to evaluate log density gradient: 
@@ -34,7 +34,7 @@ $(WarmupHMC.exception_to_string(e))
     """
     -Inf, -Inf .* draw
 end
-LogDensityProblems.logdensity_gradient_and_hessian(what::ReparametrizableBSLDP, x) = BridgeStan.log_density_hessian(what.posterior, x)
+LogDensityProblems.logdensity_gradient_and_hessian(what::ReparametrizableBSLDP, x) = BridgeStan.log_density_hessian(what.posterior, collect(x))
 
 Base.parent(what::ReparametrizableBSLDP) = what._posterior
 
