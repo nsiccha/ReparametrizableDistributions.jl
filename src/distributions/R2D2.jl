@@ -42,7 +42,8 @@ lja_reparametrize(source::R2D2, target::R2D2, invariants::NamedTuple, lja=0.) = 
         invariants.log_sigma, 
         invariants.logit_R2, 
         tdraw_simplex, 
-        views(tinfo.hierarchy, tdraw_hierarchy).xic
+        reshape(tdraw_hierarchy, (:, 2))[:, 2] 
+        # views(tinfo.hierarchy, tdraw_hierarchy).xic
     )
     lja, tdraw
 end
