@@ -23,9 +23,15 @@ LogDensityProblems.logdensity(what::ReparametrizableBSLDP, x) = try
 catch e
     -Inf
 end
-LogDensityProblems.logdensity_and_gradient(what::ReparametrizableBSLDP, x) = try 
-    BridgeStan.log_density_gradient(what.posterior, x)
+LogDensityProblems.logdensity_and_gradient(source::ReparametrizableBSLDP, draw) = try 
+    BridgeStan.log_density_gradient(source.posterior, draw)
 catch e
+    @warn """
+Failed to evaluate log density gradient: 
+$source
+$draw
+$(WarmupHMC.exception_to_string(e))
+    """
     -Inf, -Inf .* x
 end
 LogDensityProblems.logdensity_gradient_and_hessian(what::ReparametrizableBSLDP, x) = BridgeStan.log_density_hessian(what.posterior, x)

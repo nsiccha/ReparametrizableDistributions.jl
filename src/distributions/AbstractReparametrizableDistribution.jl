@@ -1,21 +1,18 @@
 abstract type AbstractReparametrizableDistribution <: ContinuousMultivariateDistribution end
 Broadcast.broadcastable(source::AbstractReparametrizableDistribution) = Ref(source)
 
-# Debug print exceptions:
-# https://stackoverflow.com/questions/72718578/julia-how-to-get-an-error-message-and-stacktrace-as-string
-function exception_to_string(e)
-    error_msg = sprint(showerror, e)
-    st = sprint((io,v) -> show(io, "text/plain", v), stacktrace(catch_backtrace()))
-    "Trouble doing things:\n$(error_msg)\n$(st)"
-end
-
 Base.getproperty(source::T, key::Symbol) where {T<:AbstractReparametrizableDistribution} = hasfield(T, key) ? getfield(source, key) : getproperty(info(source), key)
 
 LogDensityProblems.dimension(source::AbstractReparametrizableDistribution) = length(source)
 LogDensityProblems.logdensity(source::AbstractReparametrizableDistribution, draw::AbstractVector) = try 
     WarmupHMC.lpdf_and_invariants(source, draw).lpdf
 catch e
-    @debug exception_to_string(e)
+    @warn """
+Failed to evaluate log density: 
+$source
+$draw
+$(WarmupHMC.exception_to_string(e))
+    """
     -Inf
 end
 
