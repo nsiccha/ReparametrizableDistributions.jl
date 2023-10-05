@@ -1,3 +1,7 @@
+WarmupHMC.reparametrize(::ADGradientWrapper, target::AbstractReparametrizableDistribution) = begin
+    ADgradient(:ReverseDiff, target)
+end
+
 struct ReparametrizableBSLDP{F,P} <: ADGradientWrapper
     stan_file::AbstractString
     posterior::StanModel
