@@ -1,4 +1,5 @@
 abstract type AbstractReparametrizableDistribution <: ContinuousMultivariateDistribution end
+Broadcast.broadcastable(source::AbstractReparametrizableDistribution) = Ref(source)
 
 # Debug print exceptions:
 # https://stackoverflow.com/questions/72718578/julia-how-to-get-an-error-message-and-stacktrace-as-string

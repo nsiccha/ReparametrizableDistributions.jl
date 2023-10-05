@@ -4,6 +4,7 @@ struct ReparametrizableBSLDP{F,P} <: ADGradientWrapper
     model_function::F
     _posterior::P
 end
+Broadcast.broadcastable(source::ReparametrizableBSLDP) = Ref(source)
 ReparametrizableBSLDP(stan_file, model_function, data) = ReparametrizableBSLDP(
     stan_file,
     StanModel(;stan_file=stan_file, data=data),
