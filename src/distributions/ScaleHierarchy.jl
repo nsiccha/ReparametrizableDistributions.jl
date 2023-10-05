@@ -48,7 +48,7 @@ end
 recombine(source::ScaleHierarchy, resources) = begin 
     ScaleHierarchy(
         source.log_scale, 
-        getproperty.(resources, :centeredness)
+        vcat(getproperty.(resources, :centeredness)...)
     )
 end
 
