@@ -8,14 +8,14 @@ reparametrize(source::MeanShift, parameters::AbstractVector) = MeanShift(source.
 
 lpdf_and_invariants(source::MeanShift, draw::NamedTuple, lpdf=0.) = begin
     _info = info(source)
-    intercept = draw.intercept .- sum(draw.weights .* _info.mean_shift)
+    intercept = draw.intercept .+ sum(draw.weights .* _info.mean_shift)
     lpdf += sum_logpdf(_info.intercept, intercept)
     (;lpdf, intercept, draw.weights)
 end
 
 lja_reparametrize(::MeanShift, target::MeanShift, invariants::NamedTuple, lja=0.) = begin 
     tinfo = info(target)
-    tintercept = invariants.intercept .+ sum(invariants.weights .* tinfo.mean_shift)
+    tintercept = invariants.intercept .- sum(invariants.weights .* tinfo.mean_shift)
     # tdraw = StackedArray((;intercept=tintercept, weights=invariants.weights))
     tdraw = vcat(tintercept, invariants.weights)
     lja, tdraw
