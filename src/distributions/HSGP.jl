@@ -31,7 +31,7 @@ lpdf_and_invariants(source::HSGP, draw::NamedTuple, lpdf=0.) = begin
     log_scale = (
         draw.log_sd .+ .25 * log(2*pi) .+ .5 * draw.log_lengthscale
     ) .+ lengthscale.^2 .* _info.pre_eig
-    log_scale = logaddexp(1e-8, log_scale)
+    log_scale = logaddexp.(1e-8, log_scale)
     hierarchy = lpdf_and_invariants(_info.hierarchy, (;log_scale, xic=draw.hierarchy))
     intercept = lpdf_and_invariants(_info.intercept, (;draw.intercept, hierarchy.weights))
     lpdf += intercept.lpdf
