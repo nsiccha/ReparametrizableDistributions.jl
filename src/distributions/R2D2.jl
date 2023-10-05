@@ -41,3 +41,12 @@ lja_reparametrize(source::R2D2, target::R2D2, invariants::NamedTuple, lja=0.) = 
     tdraw = vcat(invariants.log_sigma, invariants.logit_R2, tdraw_simplex, views(tdraw_hierarchy).xic)
     lja, tdraw
 end
+
+divide(source::R2D2, draws::AbstractVector{<:NamedTuple}) = begin 
+    subsources = (source.simplex, source.hierarchy)
+    subdraws = getproperty.(draws, :simplex), getproperty.(draws, :hierarchy)
+    subsources, subdraws
+end
+recombine(source::R2D2, resources) = begin 
+    R2D2(merge(source.info, (simplex=resources[1], hierarchy=resources[2])))
+end
