@@ -28,7 +28,7 @@ lpdf_and_invariants(source::HSGP, draw::NamedTuple, lpdf=0.) = begin
     _info = info(source)
     # alpha * sqrt(sqrt(2*pi()) * rho) * exp(-0.25*(rho*pi()/2/L)^2 * linspaced_vector(M, 1, M)^2);
     lengthscale = exp.(draw.log_lengthscale)
-    log_scale = (
+    log_scale = log(1e-8) .+ (
         draw.log_sd .+ .25 * log(2*pi) .+ .5 * draw.log_lengthscale
     ) .+ lengthscale.^2 .* _info.pre_eig
     hierarchy = lpdf_and_invariants(_info.hierarchy, (;log_scale, xic=draw.hierarchy))
