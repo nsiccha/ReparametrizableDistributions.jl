@@ -32,7 +32,7 @@ $source
 $draw
 $(WarmupHMC.exception_to_string(e))
     """
-    -Inf, -Inf .* x
+    -Inf, -Inf .* draw
 end
 LogDensityProblems.logdensity_gradient_and_hessian(what::ReparametrizableBSLDP, x) = BridgeStan.log_density_hessian(what.posterior, x)
 
