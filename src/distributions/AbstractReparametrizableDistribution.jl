@@ -33,14 +33,14 @@ reparametrize(source::AbstractReparametrizableDistribution, parameters::Abstract
     source, views(_reparametrization_parameters(source), parameters)
 )
 lpdf_and_invariants(source::AbstractReparametrizableDistribution, draw::AbstractVector, lpdf=0.) = lpdf_and_invariants(source, views(source, draw), lpdf)
-lja_reparametrize(source::AbstractReparametrizableDistribution, target::AbstractReparametrizableDistribution, draw::AbstractVector, lja=0.) = try 
-    lja, tdraw = lja_reparametrize(source, target, lpdf_and_invariants(source, draw), lja)
-    !all(isfinite.(tdraw)) && println((;source, target, draw, lpdf_and_invariants=lpdf_and_invariants(source, draw), tdraw))
-    lja, collect(tdraw)
-catch e
-    @debug exception_to_string(e)
-    NaN, NaN .* draw
-end
+# lja_reparametrize(source::AbstractReparametrizableDistribution, target::AbstractReparametrizableDistribution, draw::AbstractVector, lja=0.) = try 
+#     lja, tdraw = lja_reparametrize(source, target, lpdf_and_invariants(source, draw), lja)
+#     # !all(isfinite.(tdraw)) && println((;source, target, draw, lpdf_and_invariants=lpdf_and_invariants(source, draw), tdraw))
+#     lja, collect(tdraw)
+# catch e
+#     @debug exception_to_string(e)
+#     NaN, NaN .* draw
+# end
 # Base.isapprox(lhs::AbstractReparametrizableDistribution, rhs::AbstractReparametrizableDistribution) = begin 
 #     linfo, rinfo = info.((lhs, rhs))
 #     keys(linfo) == keys(rinfo) && all(map(isapprox, linfo, rinfo))
