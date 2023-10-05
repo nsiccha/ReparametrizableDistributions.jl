@@ -20,7 +20,7 @@ lja_reparametrize(source::ReparametrizablePosterior, target::ReparametrizablePos
     sum(first.(intermediates)), vcat(last.(intermediates)...)
 end
 
-find_reparametrization(source::ReparametrizablePosterior, draws::AbstractMatrix; kwargs...) = begin
+find_reparametrization(source::ReparametrizablePosterior, draws; kwargs...) = begin
     ReparametrizablePosterior(
         source.likelihood,
         map((args...)->find_reparametrization(args...; kwargs...), source.prior, views(source, draws))

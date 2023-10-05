@@ -50,3 +50,12 @@ lja_reparametrize(source::HSGP, target::HSGP, invariants::NamedTuple, lja=0.) = 
     tdraw = vcat(views(tdraw_intercept).intercept, invariants.log_sd, invariants.log_lengthscale, views(tdraw_hierarchy).xic)
     lja, tdraw
 end
+
+divide(source::HSGP, draws::AbstractVector{<:NamedTuple}) = begin 
+    subsources = (source.intercept, source.hierarchy)
+    subdraws = getproperty.(draws, :intercept), getproperty.(draws, :hierarchy)
+    subsources, subdraws
+end
+recombine(source::HSGP, resources) = begin 
+    HSGP(merge(source.info, (intercept=resources[1], hierarchy=resources[2])))
+end
