@@ -92,8 +92,8 @@ lja_reparametrize(::LocScaleHierarchy, target::LocScaleHierarchy, invariants::Na
         invariants.weights .- invariants.location,
         invariants.log_scale .* (tinfo.c2 .- 1)
     ) .+ tinfo.c1 .* invariants.location
-    tdraw = StackedArray((;invariants.location, invariants.log_scale, xic=txic))
-    # tdraw = vcat(invariants.location, invariants.log_scale, txic)
+    # tdraw = StackedArray((;invariants.location, invariants.log_scale, xic=txic))
+    tdraw = vcat(invariants.location, invariants.log_scale, txic...)
     prior_txic = Normal.(invariants.location .* tinfo.c1, exp.(invariants.log_scale .* tinfo.c2))
     lja += sum_logpdf(prior_txic, txic)
     lja, tdraw
