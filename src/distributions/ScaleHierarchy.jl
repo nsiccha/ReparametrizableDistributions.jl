@@ -85,7 +85,7 @@ divide(source::LocScaleHierarchy, draws::AbstractVector{<:NamedTuple}) = begin
     ]
     subdraws = [
         [
-            (;draw.location, draw.log_scale, draw.weights[i:i])
+            (;draw.location, draw.log_scale, weights=draw.weights[i:i])
             for draw in draws
         ]
         for i in eachindex(source.c1)
