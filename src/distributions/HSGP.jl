@@ -48,9 +48,11 @@ lja_reparametrize(source::HSGP, target::HSGP, invariants::NamedTuple, lja=0.) = 
     lja += lja_intercept
     lja += lja_hierarchy
     tdraw = vcat(
-        views(tinfo.intercept, tdraw_intercept).intercept, 
-        invariants.log_sd, invariants.log_lengthscale, 
-        views(tinfo.hierarchy, tdraw_hierarchy).xic
+        # views(tinfo.intercept, tdraw_intercept).intercept, 
+        tdraw_intercept[1],
+        invariants.log_sd, invariants.log_lengthscale,
+        reshape(tdraw_hierarchy, (:, 2))[:, 2] 
+        # views(tinfo.hierarchy, tdraw_hierarchy).xic
     )
     lja, tdraw
 end
