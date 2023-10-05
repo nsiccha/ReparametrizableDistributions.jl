@@ -38,7 +38,12 @@ lja_reparametrize(source::R2D2, target::R2D2, invariants::NamedTuple, lja=0.) = 
     # lja_hierarchy = sum_logpdf(tprior_hierarchy, tdraw_hierarchy)
     lja += lja_simplex 
     lja += lja_hierarchy
-    tdraw = vcat(invariants.log_sigma, invariants.logit_R2, tdraw_simplex, views(tdraw_hierarchy).xic)
+    tdraw = vcat(
+        invariants.log_sigma, 
+        invariants.logit_R2, 
+        tdraw_simplex, 
+        views(tinfo.hierarchy, tdraw_hierarchy).xic
+    )
     lja, tdraw
 end
 
