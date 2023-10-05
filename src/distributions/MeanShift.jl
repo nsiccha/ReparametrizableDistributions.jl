@@ -16,6 +16,7 @@ end
 lja_reparametrize(::MeanShift, target::MeanShift, invariants::NamedTuple, lja=0.) = begin 
     tinfo = info(target)
     tintercept = invariants.intercept .+ sum(invariants.weights .* tinfo.mean_shift)
-    tdraw = StackedArray((;intercept=tintercept, weights=invariants.weights))
+    # tdraw = StackedArray((;intercept=tintercept, weights=invariants.weights))
+    tdraw = vcat(tintercept, invariants.weights...)
     lja, tdraw
 end
