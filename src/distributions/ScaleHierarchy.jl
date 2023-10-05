@@ -31,6 +31,27 @@ lja_reparametrize(::ScaleHierarchy, target::ScaleHierarchy, invariants::NamedTup
     lja, tdraw
 end
 
+divide(source::ScaleHierarchy, draws::AbstractVector{<:NamedTuple}) = begin 
+    subsources = [
+        ScaleHierarchy(source.log_scale, [centeredness])
+        for centeredness in source.centeredness
+    ]
+    subdraws = [
+        [
+            (;draw.log_scale, weights=draw.weights[i:i])
+            for draw in draws
+        ]
+        for i in eachindex(source.centeredness)
+    ]
+    subsources, subdraws
+end
+recombine(source::ScaleHierarchy, resources) = begin 
+    ScaleHierarchy(
+        source.log_scale, 
+        getproperty.(resources, :centeredness)
+    )
+end
+
 
 struct LocScaleHierarchy{I} <: AbstractReparametrizableDistribution
     info::I

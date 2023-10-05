@@ -58,10 +58,10 @@ import LogDensityProblemsAD: ADgradient, ADGradientWrapper
 WarmupHMC.reparametrize(::ADGradientWrapper, target::AbstractReparametrizableDistribution) = begin
     ADgradient(:ReverseDiff, target)
 end
-# divide(source::Any, draws::AbstractMatrix) = (source, ), (lpdf_and_invariants(source, draws), )
+divide(source::Any, draws::AbstractMatrix) = (source, ), (lpdf_and_invariants(source, draws, Ignore()), )
 divide(source, draws) = (source, ), (draws, )
 recombine(::Any, resources::NTuple{1}) = resources[1]
 WarmupHMC.find_reparametrization(source::AbstractReparametrizableDistribution, draws; kwargs...) = begin
-    recombine(source, WarmupHMC.find_reparametrization.(:Optim, divide(source, lpdf_and_invariants(source, draws))...; kwargs...))
+    recombine(source, WarmupHMC.find_reparametrization.(:Optim, divide(source, draws)...; kwargs...))
 end
 kmap(f, args...; kwargs...) = map((args...)->f(args...; kwargs...), args...)
