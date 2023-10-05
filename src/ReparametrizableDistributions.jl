@@ -8,7 +8,7 @@ using BridgeStan, JSON
 
 import WarmupHMC: reparametrization_parameters, reparametrize, lpdf_and_invariants, lja_reparametrize, find_reparametrization
 
-import LogDensityProblemsAD: ADGradientWrapper
+import LogDensityProblemsAD: ADgradient, ADGradientWrapper
 
 include("utils/StackedVector.jl")
 include("utils/finite_unconstraining.jl")
