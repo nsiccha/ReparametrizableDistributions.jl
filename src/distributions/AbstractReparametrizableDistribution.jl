@@ -16,7 +16,7 @@ $(WarmupHMC.exception_to_string(e))
     -Inf
 end
 
-default_info(::AbstractReparametrizableDistribution) = NamedTuple()
+# default_info(::AbstractReparametrizableDistribution) = NamedTuple()
 info(source::AbstractReparametrizableDistribution) = source.info#merge(default_info(source), source.info)
 length_info(source::AbstractReparametrizableDistribution) = info(source)
 reparametrization_info(source::AbstractReparametrizableDistribution) = info(source)
