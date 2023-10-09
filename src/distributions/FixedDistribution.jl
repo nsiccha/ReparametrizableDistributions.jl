@@ -2,7 +2,7 @@ struct FixedDistribution{W} <: AbstractReparametrizableDistribution
     wrapped::W
 end
 
-reparametrization_parameters(::FixedDistribution) = Float64[]
+info(source::FixedDistribution) = info(source.wrapped)
 reparametrize(source::FixedDistribution, ::Any) = source
 lja_reparametrize(::FixedDistribution, ::FixedDistribution, draw::AbstractVector, lja=0.) = 
 lja, draw
