@@ -3,9 +3,7 @@ struct ReparametrizablePosterior{L,P} <: AbstractCompositeReparametrizableDistri
     prior::P
 end
 
-remake(source::ReparametrizablePosterior, parts) = ReparametrizablePosterior(
-    source.likelihood, parts
-)
+remake(source::ReparametrizablePosterior, parts) = ReparametrizablePosterior(source.likelihood, parts)
 parts(source::ReparametrizablePosterior) = source.prior
 
 lpdf_and_invariants(source::ReparametrizablePosterior, draw::NamedTuple, lpdf=0.) = begin 
