@@ -2,7 +2,7 @@ struct FixedDistribution{W} <: AbstractReparametrizableDistribution
     wrapped::W
 end
 
-info(source::FixedDistribution) = info(source.wrapped)
+Base.length(source::FixedDistribution) = length(source.wrapped)
 reparametrize(source::FixedDistribution, ::Any) = source
 lja_reparametrize(::FixedDistribution, ::FixedDistribution, draw::AbstractVector, lja=0.) = 
 lja, draw

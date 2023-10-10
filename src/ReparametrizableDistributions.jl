@@ -10,7 +10,12 @@ import WarmupHMC: reparametrization_parameters, reparametrize, lpdf_and_invarian
 
 import LogDensityProblemsAD: ADgradient, ADGradientWrapper
 
-include("utils/StackedVector.jl")
+kmap(f, args...; kwargs...) = map((args...)->f(args...; kwargs...), args...)
+kmap(f, arg::NamedTuple, args...; kwargs...) = kmap(f, arg, enure_like.(Ref(arg), args)...; kwargs...)
+enure_like(::NamedTuple{names}, rhs::NamedTuple) where {names} = NamedTuple{names}(rhs)
+enure_like(::NamedTuple{names}, rhs) where {names} = NamedTuple{names}((rhs for name in names))
+
+include("utils/StackedArray.jl")
 include("utils/finite_unconstraining.jl")
 include("utils/quantile_and_cdf.jl")
 include("distributions/AbstractReparametrizableDistribution.jl")
@@ -18,10 +23,11 @@ include("distributions/ScaleHierarchy.jl")
 include("distributions/MeanShift.jl")
 include("distributions/Directional.jl")
 include("distributions/GammaSimplex.jl")
+include("distributions/FixedDistribution.jl")
+include("distributions/AbstractCompositeReparametrizableDistribution.jl")
 include("distributions/HSGP.jl")
 include("distributions/R2D2.jl")
 include("distributions/ReparametrizablePosterior.jl")
 include("distributions/ReparametrizableBSLDP.jl")
-include("distributions/FixedDistribution.jl")
 
 end # module ReparametrizableDistributions

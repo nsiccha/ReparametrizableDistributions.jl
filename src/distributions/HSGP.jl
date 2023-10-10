@@ -1,7 +1,7 @@
 
-abstract type AbstractHSGP <: AbstractReparametrizableDistribution end
+# abstract type AbstractHSGP <: AbstractReparametrizableDistribution end
 
-struct HSGP{I} <: AbstractHSGP
+struct HSGP{I} <: AbstractReparametrizableDistribution
     info::I
 end
 HSGP(intercept, log_sd, log_lengthscale; intercept_shift, centeredness, kwargs...) = HSGP(
@@ -20,7 +20,7 @@ hsgp_extra(;x, n_functions::Integer=32, boundary_factor::Real=1.5) = begin
     pre_eig = (-.25 * (pi/2/boundary_factor)^2) .* idxs .^ 2
     (;X, pre_eig)
 end
-length_info(source::HSGP) = Length((intercept=1, log_sd=1, log_lengthscale=1, hierarchy=length(source.info.hierarchy)))
+# lengths(source::HSGP) = (intercept=length(source.intercept), log_sd=1, log_lengthscale=1, hierarchy=length(source.info.hierarchy))
 reparametrize(source::HSGP, parameters::NamedTuple) = HSGP(map(reparametrize, info(source), parameters))
 
 
@@ -32,8 +32,8 @@ lpdf_and_invariants(source::HSGP, draw::NamedTuple, lpdf=0.) = begin
         draw.log_sd .+ .25 * log(2*pi) .+ .5 * draw.log_lengthscale
     ) .+ lengthscale.^2 .* _info.pre_eig
     log_scale = logaddexp.(1e-8, log_scale)
-    hierarchy = lpdf_and_invariants(_info.hierarchy, (;log_scale, xic=draw.hierarchy))
-    intercept = lpdf_and_invariants(_info.intercept, (;draw.intercept, hierarchy.weights))
+    hierarchy = lpdf_and_invariants(_info.hierarchy, (;log_scale, xic=draw.hierarchy), lpdf)
+    intercept = lpdf_and_invariants(_info.intercept, (;draw.intercept, hierarchy.weights), lpdf)
     lpdf += intercept.lpdf
     lpdf += sum_logpdf(_info.log_sd, draw.log_sd)
     lpdf += sum_logpdf(_info.log_lengthscale, draw.log_lengthscale)
@@ -41,28 +41,28 @@ lpdf_and_invariants(source::HSGP, draw::NamedTuple, lpdf=0.) = begin
     y = intercept.intercept .+ source.X * hierarchy.weights
     (;lpdf, intercept, draw.log_sd, draw.log_lengthscale, hierarchy, y)
 end
-lja_reparametrize(source::HSGP, target::HSGP, invariants::NamedTuple, lja=0.) = begin  
-    _info = info(source)
-    tinfo = info(target)
-    lja_intercept, tdraw_intercept = lja_reparametrize(_info.intercept, tinfo.intercept, invariants.intercept)
-    lja_hierarchy, tdraw_hierarchy = lja_reparametrize(_info.hierarchy, tinfo.hierarchy, invariants.hierarchy)
-    lja += lja_intercept
-    lja += lja_hierarchy
-    tdraw = vcat(
-        # views(tinfo.intercept, tdraw_intercept).intercept, 
-        tdraw_intercept[1],
-        invariants.log_sd, invariants.log_lengthscale,
-        reshape(tdraw_hierarchy, (:, 2))[:, 2] 
-        # views(tinfo.hierarchy, tdraw_hierarchy).xic
-    )
-    lja, tdraw
-end
+# lja_reparametrize(source::HSGP, target::HSGP, invariants::NamedTuple, lja=0.) = begin  
+#     _info = info(source)
+#     tinfo = info(target)
+#     lja_intercept, tdraw_intercept = lja_reparametrize(_info.intercept, tinfo.intercept, invariants.intercept, lja)
+#     lja_hierarchy, tdraw_hierarchy = lja_reparametrize(_info.hierarchy, tinfo.hierarchy, invariants.hierarchy, lja)
+#     lja += lja_intercept
+#     lja += lja_hierarchy
+#     tdraw = vcat(
+#         # views(tinfo.intercept, tdraw_intercept).intercept, 
+#         tdraw_intercept[1],
+#         invariants.log_sd, invariants.log_lengthscale,
+#         reshape(tdraw_hierarchy, (:, 2))[:, 2] 
+#         # views(tinfo.hierarchy, tdraw_hierarchy).xic
+#     )
+#     lja, tdraw
+# end
 
-divide(source::HSGP, draws::AbstractVector{<:NamedTuple}) = begin 
-    subsources = (source.intercept, source.hierarchy)
-    subdraws = getproperty.(draws, :intercept), getproperty.(draws, :hierarchy)
-    subsources, subdraws
-end
-recombine(source::HSGP, resources) = begin 
-    HSGP(merge(source.info, (intercept=resources[1], hierarchy=resources[2])))
-end
+# divide(source::HSGP, draws::AbstractVector{<:NamedTuple}) = begin 
+#     subsources = (source.intercept, source.hierarchy)
+#     subdraws = getproperty.(draws, :intercept), getproperty.(draws, :hierarchy)
+#     subsources, subdraws
+# end
+# recombine(source::HSGP, resources) = begin 
+#     HSGP(merge(source.info, (intercept=resources[1], hierarchy=resources[2])))
+# end

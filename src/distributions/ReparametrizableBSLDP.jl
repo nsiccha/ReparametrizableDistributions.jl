@@ -21,6 +21,12 @@ LogDensityProblems.capabilities(::Type{<:ReparametrizableBSLDP}) = LogDensityPro
 LogDensityProblems.logdensity(what::ReparametrizableBSLDP, x) = try 
     BridgeStan.log_density(what.posterior, collect(x))
 catch e
+    @warn """
+Failed to evaluate log density: 
+$what
+$x
+$(WarmupHMC.exception_to_string(e))
+    """
     -Inf
 end
 LogDensityProblems.logdensity_and_gradient(source::ReparametrizableBSLDP, draw) = try 
@@ -38,7 +44,7 @@ LogDensityProblems.logdensity_gradient_and_hessian(what::ReparametrizableBSLDP, 
 
 Base.parent(what::ReparametrizableBSLDP) = what._posterior
 
-function update_dict end
+update_dict(::Any, ::Any) = error("unimplemented")
 WarmupHMC.reparametrize(source::ReparametrizableBSLDP, target::AbstractReparametrizableDistribution) = begin
     data = merge(JSON.parse(source.posterior.data), update_dict(source.model_function, target))
     ReparametrizableBSLDP(
