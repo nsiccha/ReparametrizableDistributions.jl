@@ -32,9 +32,10 @@ reparametrize(source::AbstractReparametrizableDistribution, parameters::Abstract
         views(reparametrization_parameters(source), parameters)
     )
 )
-# reparametrize(source::T, parameters::NamedTuple) where {T<:AbstractReparametrizableDistribution} = Base.typename(T).wrapper(merge(info(source), parameters))
+# MAY IMPLEMENT THIS or THE ABOVE
+reparametrize(source::T, parameters::NamedTuple) where {T<:AbstractReparametrizableDistribution} = T.name.wrapper(merge(info(source), parameters))
 # IMPLEMENT THIS or THE ABOVE
-reparametrize(::AbstractReparametrizableDistribution, ::NamedTuple) = error("unimplemented")
+# reparametrize(::AbstractReparametrizableDistribution, ::NamedTuple) = error("unimplemented")
 # MAY IMPLEMENT THIS
 # to_array(::AbstractReparametrizableDistribution, ::NamedTuple)
 # IMPLEMENT THIS
