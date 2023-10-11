@@ -46,7 +46,7 @@ LocScaleHierarchy(location, log_scale, c1, c2=c1) = LocScaleHierarchy((;location
 parts(source::LocScaleHierarchy) = (;source.location, source.log_scale, weights=source.c1)
 reparametrization_parameters(source::LocScaleHierarchy) = (;source.c1, source.c2)
 optimization_parameters_fn(::LocScaleHierarchy) = finite_logit
-reparametrize(source::LocScaleHierarchy, parameters::NamedTuple) = LocScaleHierarchy(merge(source.info, parameters))
+# reparametrize(source::LocScaleHierarchy, parameters::NamedTuple) = LocScaleHierarchy(merge(source.info, parameters))
 
 lpdf_update(source::LocScaleHierarchy, draw::NamedTuple, lpdf=0.) = begin
     # Mirroring https://num.pyro.ai/en/stable/_modules/numpyro/infer/reparam.html#LocScaleReparam
