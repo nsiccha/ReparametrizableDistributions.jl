@@ -11,7 +11,7 @@ reparametrize(source::ACRD, parameters::NamedTuple) = recombine(
 # IMPLEMENT THIS
 lpdf_update(::ACRD, ::NamedTuple, lpdf=0.) = error("unimplemented")
 lja_update(source::ACRD, target::ACRD, invariants::NamedTuple, lja=0.) = begin 
-    intermediates = kmap(lja_update, parts(source), parts(target), invariants, lja)
+    intermediates = kmap(lja_and_reparametrize, parts(source), parts(target), invariants, lja)
     (;lja=sum(getproperty.(values(intermediates), :lja)), intermediates...)
 end
 
