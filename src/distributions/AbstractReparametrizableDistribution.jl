@@ -15,7 +15,11 @@ to_nt(source::AbstractReparametrizableDistribution, draw::AbstractArray) = views
 reparametrization_parameters(::AbstractReparametrizableDistribution) = error("unimplemented")
 # IMPLEMENTING THIS FOR WarmupHMC.jl
 optimization_reparametrization_parameters(source::AbstractReparametrizableDistribution) = vcat(
-    map(broadcast, optimization_parameters_fn(source), reparametrization_parameters(source))...
+    map(
+        broadcast, 
+        ensure_like(reparametrization_parameters(source), optimization_parameters_fn(source)), 
+        reparametrization_parameters(source)
+    )...
 )
 # MAY IMPLEMENT THIS
 optimization_parameters_fn(::AbstractReparametrizableDistribution) = identity
