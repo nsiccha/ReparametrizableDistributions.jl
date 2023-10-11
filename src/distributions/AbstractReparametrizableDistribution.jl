@@ -8,8 +8,12 @@ Base.length(source::AbstractReparametrizableDistribution) = sum(lengths(source))
 lengths(source::AbstractReparametrizableDistribution) = map(length, parts(source))
 # IMPLEMENT THIS
 parts(::AbstractReparametrizableDistribution) = error("unimplemented")
+# IMPLEMENTING THIS FOR WarmupHMC.jl
 to_nt(source::AbstractReparametrizableDistribution, draw::AbstractArray) = views(
     parts(source), draw
+)
+to_array(source::AbstractReparametrizableDistribution, draw::NamedTuple) = vcat(
+    kmap(to_array, parts(source), draw)...
 )
 # IMPLEMENT THIS
 reparametrization_parameters(::AbstractReparametrizableDistribution) = error("unimplemented")
