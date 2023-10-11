@@ -10,9 +10,9 @@ import WarmupHMC: reparametrization_parameters, optimization_reparametrization_p
 
 import LogDensityProblemsAD: ADgradient, ADGradientWrapper
 
-kmap(f, args...; kwargs...) = map((args...)->f(args...; kwargs...), args...)
-kmap(f, arg::Tuple, args...; kwargs...) = kmap(f, arg, args...; kwargs...)
-kmap(f, arg::NamedTuple, args...; kwargs...) = kmap(f, arg, ensure_like.(Ref(arg), args)...; kwargs...)
+kmap_(f, args...; kwargs...) = map((args...)->f(args...; kwargs...), args...)
+kmap(f, args...; kwargs...) = kmap_(f, args...; kwargs...)
+kmap(f, arg::NamedTuple, args...; kwargs...) = kmap_(f, arg, ensure_like.(Ref(arg), args)...; kwargs...)
 ensure_like(::NamedTuple{names}, rhs::NamedTuple) where {names} = NamedTuple{names}(rhs)
 ensure_like(::NamedTuple{names}, rhs) where {names} = NamedTuple{names}((rhs for name in names))
 
