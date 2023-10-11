@@ -12,8 +12,9 @@ parts(::AbstractReparametrizableDistribution) = error("unimplemented")
 to_nt(source::AbstractReparametrizableDistribution, draw::AbstractArray) = views(
     parts(source), draw
 )
+to_array_limited(source, draw) = view(to_array(source, draw), 1:length(source))
 to_array(source::AbstractReparametrizableDistribution, draw::NamedTuple) = vcat(
-    kmap(to_array, parts(source), draw)...
+    kmap(to_array_limited, parts(source), draw)...
 )
 # IMPLEMENT THIS
 reparametrization_parameters(::AbstractReparametrizableDistribution) = error("unimplemented")
