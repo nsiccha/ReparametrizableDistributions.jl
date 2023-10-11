@@ -44,7 +44,7 @@ struct LocScaleHierarchy{I} <: AbstractReparametrizableDistribution
 end
 LocScaleHierarchy(location, log_scale, c1, c2=c1) = LocScaleHierarchy((;location, log_scale, c1, c2))
 parts(source::LocScaleHierarchy) = (;source.location, source.log_scale, weights=source.c1)
-reparametrization_parameters(source::LocScaleHierarchy) = (;source.c1. source.c2)
+reparametrization_parameters(source::LocScaleHierarchy) = (;source.c1, source.c2)
 optimization_parameters_fn(::LocScaleHierarchy) = finite_logit
 
 lpdf_update(source::LocScaleHierarchy, draw::NamedTuple, lpdf=0.) = begin
