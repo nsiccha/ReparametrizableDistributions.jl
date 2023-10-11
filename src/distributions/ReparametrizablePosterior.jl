@@ -10,7 +10,11 @@ divide(source::ReparametrizablePosterior, draws::AbstractMatrix) = parts(source)
 
 lpdf_and_invariants(source::ReparametrizablePosterior, draw::NamedTuple, lpdf=0.) = begin 
     prior_invariants = kmap(lpdf_and_invariants, source.prior, draw, lpdf)
-    likelihood_invariants = source.likelihood(prior_invariants)
-    lpdf += likelihood_invariants.lpdf + sum(getproperty.(values(prior_invariants), :lpdf))
-    (;lpdf, likelihood=likelihood_invariants, prior_invariants...)
+    if isa(lpdf, Ignore)
+        (;lpdf, prior_invariants...)
+    else
+        likelihood_invariants = source.likelihood(prior_invariants)
+        lpdf += likelihood_invariants.lpdf + sum(getproperty.(values(prior_invariants), :lpdf))
+        (;lpdf, likelihood=likelihood_invariants, prior_invariants...)
+    end
 end
