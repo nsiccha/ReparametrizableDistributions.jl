@@ -2,13 +2,15 @@ abstract type AbstractReparametrizableDistribution <: ContinuousMultivariateDist
 Broadcast.broadcastable(source::AbstractReparametrizableDistribution) = Ref(source)
 
 Base.getproperty(source::T, key::Symbol) where {T<:AbstractReparametrizableDistribution} = hasfield(T, key) ? getfield(source, key) : getproperty(info(source), key)
-info(source::AbstractReparametrizableDistribution) = source.info
+info(source::AbstractReparametrizableDistribution) = getfield(source, :info)
 
 Base.length(source::AbstractReparametrizableDistribution) = sum(lengths(source))
 lengths(source::AbstractReparametrizableDistribution) = map(length, parts(source))
 # IMPLEMENT THIS
 parts(::AbstractReparametrizableDistribution) = error("unimplemented")
-views(source::AbstractReparametrizableDistribution, draw::AbstractArray) = views(Length(lengths(source)), draw)
+to_nt(source::AbstractReparametrizableDistribution, draw::AbstractArray) = views(
+    parts(source), draw
+)
 # IMPLEMENT THIS
 reparametrization_parameters(::AbstractReparametrizableDistribution) = error("unimplemented")
 # IMPLEMENTING THIS FOR WarmupHMC.jl
@@ -43,11 +45,14 @@ find_reparametrization(source::AbstractReparametrizableDistribution, draws::Abst
     source, kmap(find_reparametrization, divide(source, draws)...; kwargs...)
 )
 # MAY IMPLEMENT THIS
-divide(source::Any, draws::AbstractMatrix) = divide(source, lpdf_and_invariants(source, draws, Ignore()))
+divide(source, draws::AbstractMatrix) = divide(
+    source, lpdf_and_invariants(source, draws, Ignore())
+)
 # MAY IMPLEMENT THIS
-divide(source, draws) = (source, ), (draws, )
+divide(source, draws::AbstractVector{<:NamedTuple}) = (source, ), (draws, )
 # MAY IMPLEMENT THIS
 recombine(::Any, resources::NTuple{1}) = resources[1]
+# recombine(::Any, ::Any) = error("unimplemented")
 
 
 # IMPLEMENTING THIS FOR LogDensityProblems.jl
