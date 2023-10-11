@@ -6,7 +6,7 @@ using WarmupHMC, Distributions, LogDensityProblems, LogExpFunctions
 using SpecialFunctions, HypergeometricFunctions, ChainRulesCore
 using BridgeStan, JSON
 
-import WarmupHMC: reparametrization_parameters, reparametrization_optimization_parameters, reparametrize, lja_reparametrize, to_array, lpdf_update, lja_update, find_reparametrization
+import WarmupHMC: reparametrization_parameters, optimization_reparametrization_parameters, reparametrize, lpdf_and_invariants, lja_and_reparametrize, to_array, to_nt, lpdf_update, lja_update, find_reparametrization
 
 import LogDensityProblemsAD: ADgradient, ADGradientWrapper
 
