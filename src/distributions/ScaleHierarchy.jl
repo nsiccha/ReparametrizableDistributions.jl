@@ -81,23 +81,23 @@ lja_update(::LocScaleHierarchy, target::LocScaleHierarchy, invariants::NamedTupl
     (;lja, weights)
 end
 
-# divide(source::LocScaleHierarchy, draws::AbstractVector{<:NamedTuple}) = begin 
-#     subsources = [
-#         LocScaleHierarchy(source.location, source.log_scale, [c1], [c2])
-#         for (c1, c2) in zip(source.c1, source.c2)
-#     ]
-#     subdraws = [
-#         [
-#             (;draw.location, draw.log_scale, weights=draw.weights[i:i])
-#             for draw in draws
-#         ]
-#         for i in eachindex(source.c1)
-#     ]
-#     subsources, subdraws
-# end
-# recombine(source::LocScaleHierarchy, resources) = begin 
-#     LocScaleHierarchy(
-#         source.location, source.log_scale, 
-#         vcat(getproperty.(resources, :c1)...), vcat(getproperty.(resources, :c2)...)
-#     )
-# end
+divide(source::LocScaleHierarchy, draws::AbstractVector{<:NamedTuple}) = begin 
+    subsources = [
+        LocScaleHierarchy(source.location, source.log_scale, [c1], [c2])
+        for (c1, c2) in zip(source.c1, source.c2)
+    ]
+    subdraws = [
+        [
+            (;draw.location, draw.log_scale, weights=draw.weights[i:i])
+            for draw in draws
+        ]
+        for i in eachindex(source.c1)
+    ]
+    subsources, subdraws
+end
+recombine(source::LocScaleHierarchy, resources) = begin 
+    LocScaleHierarchy(
+        source.location, source.log_scale, 
+        vcat(getproperty.(resources, :c1)...), vcat(getproperty.(resources, :c2)...)
+    )
+end
