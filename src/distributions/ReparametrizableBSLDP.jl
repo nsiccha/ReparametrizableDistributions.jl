@@ -4,9 +4,9 @@ struct ReparametrizableBSLDP{F,W} <: AbstractWrappedDistribution
     model_function::F
     wrapped::W
 end
-ReparametrizableBSLDP(lib_path, model_function, data) = ReparametrizableBSLDP(
+ReparametrizableBSLDP(lib_path::AbstractString, model_function, data::AbstractDict) = ReparametrizableBSLDP(
     lib_path,
-    StanModel(lib_path, data),
+    StanModel(String(lib_path), JSON.json(data)),
     model_function,
     model_function(data)
 )
