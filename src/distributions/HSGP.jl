@@ -60,7 +60,7 @@ phsgp_extra(;x, n_functions::Integer=32, boundary_factor::Real=1.5) = begin
     # );
     xi = (2 .* pi .* x ./ boundary_factor) .* idxs'
     X = hcat(cos.(xi), sin.(xi))
-    (;X, idxs)
+    (;X, vcat(idxs, idxs))
 end
 parts(source::PHSGP) = (;source.log_sd, source.log_lengthscale, source.hierarchy)
 
