@@ -28,7 +28,7 @@ lpdf_update(source::HSGP, draw::NamedTuple, lpdf=0.) = begin
     log_scale = (
         draw.log_sd .+ .25 * log(2*pi) .+ .5 * draw.log_lengthscale
     ) .+ lengthscale.^2 .* source.pre_eig
-    log_scale = logaddexp.(1e-8, log_scale)
+    log_scale = logaddexp.(log(1e-8), log_scale)
     hierarchy = lpdf_and_invariants(source.hierarchy, (;log_scale, weights=draw.hierarchy), lpdf)
     intercept = lpdf_and_invariants(source.intercept, (;draw.intercept, hierarchy.weights), lpdf)
     lpdf += intercept.lpdf
@@ -73,7 +73,7 @@ lpdf_update(source::PHSGP, draw::NamedTuple, lpdf=0.) = begin
         # Let's see whether this is stable
         draw.log_sd .+ .5 * (log(2) .+ log.(besselix.(source.idxs, a)))
     )
-    log_scale = logaddexp.(1e-8, log_scale)
+    log_scale = logaddexp.(log(1e-8), log_scale)
     log_scale = vcat(log_scale, log_scale)
     hierarchy = lpdf_and_invariants(source.hierarchy, (;log_scale, weights=draw.hierarchy), lpdf)
     lpdf += sum_logpdf(source.log_sd, draw.log_sd)
