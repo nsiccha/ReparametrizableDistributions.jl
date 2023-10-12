@@ -60,7 +60,7 @@ phsgp_extra(;x, n_functions::Integer=32, boundary_factor::Real=1.5) = begin
     # );
     xi = (2 .* pi .* x ./ boundary_factor) .* idxs'
     X = hcat(cos.(xi), sin.(xi))
-    (;X, vcat(idxs, idxs))
+    (;X, idxs)
 end
 parts(source::PHSGP) = (;source.log_sd, source.log_lengthscale, source.hierarchy)
 
@@ -74,6 +74,7 @@ lpdf_update(source::PHSGP, draw::NamedTuple, lpdf=0.) = begin
         draw.log_sd .+ .5 * (log(2) .+ log.(besselix.(source.idxs, a)))
     )
     log_scale = logaddexp.(1e-8, log_scale)
+    log_scale = vcat(log_scale, log_scale)
     hierarchy = lpdf_and_invariants(source.hierarchy, (;log_scale, weights=draw.hierarchy), lpdf)
     lpdf += sum_logpdf(source.log_sd, draw.log_sd)
     lpdf += sum_logpdf(source.log_lengthscale, draw.log_lengthscale)
