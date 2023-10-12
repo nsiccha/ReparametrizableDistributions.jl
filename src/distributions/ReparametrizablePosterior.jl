@@ -8,7 +8,7 @@ recombine(source::ReparametrizablePosterior, prior) = ReparametrizablePosterior(
 )
 divide(source::ReparametrizablePosterior, draws::AbstractMatrix) = parts(source), to_nt(source, draws)
 
-lpdf_and_invariants(source::ReparametrizablePosterior, draw::NamedTuple, lpdf=0.) = begin 
+lpdf_update(source::ReparametrizablePosterior, draw::NamedTuple, lpdf=0.) = begin 
     prior_invariants = kmap(lpdf_and_invariants, source.prior, draw, lpdf)
     if isa(lpdf, Ignore)
         (;lpdf, prior_invariants...)

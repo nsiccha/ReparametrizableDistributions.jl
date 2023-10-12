@@ -24,7 +24,7 @@ $(WarmupHMC.exception_to_string(e))
     """
     -Inf
 end
-LogDensityProblems.logdensity_and_gradient(source::ReparametrizableBSLDP, draw) = try 
+LogDensityProblems.logdensity_and_gradient(source::ReparametrizableBSLDP, draw::AbstractVector) = try 
     BridgeStan.log_density_gradient(source.proxy, collect(draw))
 catch e
     @warn """
@@ -35,7 +35,7 @@ $(WarmupHMC.exception_to_string(e))
     """
     -Inf, -Inf .* draw
 end
-LogDensityProblems.logdensity_gradient_and_hessian(source::ReparametrizableBSLDP, draw) = try 
+LogDensityProblems.logdensity_gradient_and_hessian(source::ReparametrizableBSLDP, draw::AbstractVector) = try 
     BridgeStan.log_density_hessian(source.proxy, collect(draw))
 catch e
     @warn """
