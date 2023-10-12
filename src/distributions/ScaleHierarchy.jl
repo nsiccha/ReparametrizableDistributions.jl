@@ -2,7 +2,7 @@ struct ScaleHierarchy{I} <: AbstractReparametrizableDistribution
     info::I
 end
 ScaleHierarchy(log_scale, centeredness) = ScaleHierarchy((;log_scale, centeredness))
-parts(source::ScaleHierarchy) = (;source.log_scale, weights=source.c1)
+parts(source::ScaleHierarchy) = (;source.log_scale, weights=source.centeredness)
 
 reparametrization_parameters(source::ScaleHierarchy) = (;source.centeredness)
 optimization_parameters_fn(::ScaleHierarchy) = finite_logit
