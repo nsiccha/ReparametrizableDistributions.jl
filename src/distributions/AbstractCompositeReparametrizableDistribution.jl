@@ -1,6 +1,7 @@
 abstract type AbstractCompositeReparametrizableDistribution <: AbstractReparametrizableDistribution end
 ACRD = AbstractCompositeReparametrizableDistribution
-# parts(source::ACRD, target) = ensure_like(parts(source), target)
+# IMPLEMENT THIS
+parts(::ACRD) = error("unimplemented")
 
 reparametrization_parameters(source::ACRD) = map(reparametrization_parameters, parts(source))
 optimization_parameters_fn(source::ACRD) = map(optimization_parameters_fn, parts(source))
