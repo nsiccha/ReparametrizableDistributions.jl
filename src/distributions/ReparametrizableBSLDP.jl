@@ -13,7 +13,7 @@ ReparametrizableBSLDP(lib_path::AbstractString, model_function, data::AbstractDi
 
 # LogDensityProblems.dimension(source::ReparametrizableBSLDP) = Int64(BridgeStan.param_unc_num(source.proxy))
 LogDensityProblems.capabilities(::Type{<:ReparametrizableBSLDP}) = LogDensityProblems.LogDensityOrder{2}()
-LogDensityProblems.logdensity(source::ReparametrizableBSLDP, draw) = try 
+LogDensityProblems.logdensity(source::ReparametrizableBSLDP, draw::AbstractVector) = try 
     BridgeStan.log_density(source.proxy, collect(draw))
 catch e
     @warn """
