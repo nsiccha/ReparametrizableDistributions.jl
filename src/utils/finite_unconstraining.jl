@@ -4,3 +4,4 @@ finite_log(x, reg=1e-16) = log.(x .+ reg)
 
 inverse(::typeof(finite_logit)) = logistic
 inverse(::typeof(finite_log)) = exp
+inverse(::typeof(identity)) = identity
