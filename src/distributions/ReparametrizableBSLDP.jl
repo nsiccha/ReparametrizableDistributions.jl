@@ -1,36 +1,31 @@
-WarmupHMC.reparametrize(::ADGradientWrapper, target::AbstractReparametrizableDistribution) = begin
-    ADgradient(:ReverseDiff, target)
-end
-
-struct ReparametrizableBSLDP{F,P} <: ADGradientWrapper
-    stan_file::AbstractString
-    posterior::StanModel
+struct ReparametrizableBSLDP{F,W} <: AbstractWrappedDistribution
+    lib_path::AbstractString
+    proxy::StanModel
     model_function::F
-    _posterior::P
+    wrapped::W
 end
-Broadcast.broadcastable(source::ReparametrizableBSLDP) = Ref(source)
-ReparametrizableBSLDP(stan_file, model_function, data) = ReparametrizableBSLDP(
-    stan_file,
-    StanModel(;stan_file=stan_file, data=data),
+ReparametrizableBSLDP(lib_path, model_function, data) = ReparametrizableBSLDP(
+    lib_path,
+    StanModel(lib_path, data),
     model_function,
-    model_function(JSON.parsefile(data))
+    model_function(data)
 )
 
-LogDensityProblems.dimension(what::ReparametrizableBSLDP) = Int64(BridgeStan.param_unc_num(what.posterior))
+# LogDensityProblems.dimension(source::ReparametrizableBSLDP) = Int64(BridgeStan.param_unc_num(source.proxy))
 LogDensityProblems.capabilities(::Type{<:ReparametrizableBSLDP}) = LogDensityProblems.LogDensityOrder{2}()
-LogDensityProblems.logdensity(what::ReparametrizableBSLDP, x) = try 
-    BridgeStan.log_density(what.posterior, collect(x))
+LogDensityProblems.logdensity(source::ReparametrizableBSLDP, draw) = try 
+    BridgeStan.log_density(source.proxy, collect(draw))
 catch e
     @warn """
 Failed to evaluate log density: 
-$what
-$x
+$source
+$draw
 $(WarmupHMC.exception_to_string(e))
     """
     -Inf
 end
 LogDensityProblems.logdensity_and_gradient(source::ReparametrizableBSLDP, draw) = try 
-    BridgeStan.log_density_gradient(source.posterior, collect(draw))
+    BridgeStan.log_density_gradient(source.proxy, collect(draw))
 catch e
     @warn """
 Failed to evaluate log density gradient: 
@@ -40,17 +35,32 @@ $(WarmupHMC.exception_to_string(e))
     """
     -Inf, -Inf .* draw
 end
-LogDensityProblems.logdensity_gradient_and_hessian(what::ReparametrizableBSLDP, x) = BridgeStan.log_density_hessian(what.posterior, collect(x))
-
-Base.parent(what::ReparametrizableBSLDP) = what._posterior
-
-update_dict(::Any, ::Any) = error("unimplemented")
-WarmupHMC.reparametrize(source::ReparametrizableBSLDP, target::AbstractReparametrizableDistribution) = begin
-    data = merge(JSON.parse(source.posterior.data), update_dict(source.model_function, target))
-    ReparametrizableBSLDP(
-        source.stan_file,
-        StanModel(;stan_file=source.stan_file, data=JSON.json(data)),
-        source.model_function,
-        source.model_function(data)
-    )
+LogDensityProblems.logdensity_gradient_and_hessian(source::ReparametrizableBSLDP, draw) = try 
+    BridgeStan.log_density_hessian(source.proxy, collect(draw))
+catch e
+    @warn """
+Failed to evaluate log density gradient: 
+$source
+$draw
+$(WarmupHMC.exception_to_string(e))
+    """
+    -Inf, -Inf .* draw, -Inf .* draw .* draw'
+end
+# IMPLEMENT THIS
+update_nt(::Any, ::Any) = error("unimplemented")
+update_dict(model_function, reparent) = Dict([
+    (String(key), value) for (key, value) in pairs(update_nt(model_function, reparent))
+])
+recombine(source::ReparametrizableBSLDP, reparent) = ReparametrizableBSLDP(
+    source.lib_path,
+    source.model_function,
+    merge(JSON.parse(source.proxy.data), update_dict(source.model_function, reparent))
+)
+verify(source::ReparametrizableBSLDP, draws::AbstractMatrix) = begin 
+    @assert BridgeStan.param_unc_num(source.proxy) == length(source.wrapped)
+    proxy_lpdfs = LogDensityProblems.log_density.(source, eachcol(draws))
+    wrapped_lpdfs = [lpdf_and_invariants(source, draw).lpdf for draw in eachcol(draws)]
+    @assert nanstd(proxy_lpdfs - wrapped_lpdfs) < 1e-8 """
+Failed lpdf check: $proxy_lpdfs != $wrapped_lpdfs
+"""
 end
