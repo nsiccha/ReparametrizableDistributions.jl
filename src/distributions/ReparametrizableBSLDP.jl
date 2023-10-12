@@ -60,7 +60,7 @@ verify(source::ReparametrizableBSLDP, draws::AbstractMatrix) = begin
     @assert BridgeStan.param_unc_num(source.proxy) == length(source.wrapped)
     proxy_lpdfs = LogDensityProblems.logdensity.(source, eachcol(draws))
     wrapped_lpdfs = [lpdf_and_invariants(source, draw).lpdf for draw in eachcol(draws)]
-    @assert nanstd(proxy_lpdfs - wrapped_lpdfs) < 1e-8 """
+    @assert WarmupHMC.nanstd(proxy_lpdfs - wrapped_lpdfs) < 1e-8 """
 Failed lpdf check: $(hcat(proxy_lpdfs, wrapped_lpdfs))
 """
 end
