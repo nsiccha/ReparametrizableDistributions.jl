@@ -107,9 +107,9 @@ end
 struct TScaleHierarchy{I} <: AbstractReparametrizableDistribution
     info::I
 end
-TScaleHierarchy(log_nu, log_scale, c1) = TScaleHierarchy((;log_nu, log_scale, c1))
-parts(source::TScaleHierarchy) = (;source.log_nu, source.log_scale, weights=source.c1)
-reparametrization_parameters(source::TScaleHierarchy) = (;source.c1)
+TScaleHierarchy(log_nu, log_scale, centeredness) = TScaleHierarchy((;log_nu, log_scale, centeredness))
+parts(source::TScaleHierarchy) = (;source.log_nu, source.log_scale, weights=source.centeredness)
+reparametrization_parameters(source::TScaleHierarchy) = (;source.centeredness)
 optimization_parameters_fn(::TScaleHierarchy) = finite_logit
 
 lpdf_update(source::TScaleHierarchy, draw::NamedTuple, lpdf=0.) = begin
@@ -118,13 +118,13 @@ lpdf_update(source::TScaleHierarchy, draw::NamedTuple, lpdf=0.) = begin
     # delta = decentered_value - centered * fn.loc
     # value = fn.loc + jnp.power(fn.scale, 1 - centered) * delta
     weights = draw.location .+ xexpy.(
-        draw.weights - source.c1 .* draw.location,
-        draw.log_scale .* (1 .- source.c1)
+        draw.weights - source.centeredness .* draw.location,
+        draw.log_scale .* (1 .- source.centeredness)
     )
     # Mirroring https://num.pyro.ai/en/stable/_modules/numpyro/infer/reparam.html#LocScaleReparam
     # params["loc"] = fn.loc * centered
     # params["scale"] = fn.scale**centered
-    prior_weights = draw.location .* source.c1 .+ exp.(draw.log_scale .* source.c1) .* TDist.(exp.(draw.log_nu)) 
+    prior_weights = draw.location .* source.centeredness .+ exp.(draw.log_scale .* source.centeredness) .* TDist.(exp.(draw.log_nu)) 
     if length(source.log_nu) > 0
         lpdf += sum_logpdf(source.log_nu, draw.log_nu)
     end
@@ -139,16 +139,16 @@ lja_update(::TScaleHierarchy, target::TScaleHierarchy, invariants::NamedTuple, l
     invariants = merge(invariants, (;location=0.))
     weights = xexpy.(
         invariants.weights .- invariants.location,
-        invariants.log_scale .* (target.c1 .- 1)
-    ) .+ target.c1 .* invariants.location
-    prior_weights = invariants.location .* target.c1 .+ exp.(invariants.log_scale .* target.c1) .* TDist.(exp.(invariants.log_nu))
+        invariants.log_scale .* (target.centeredness .- 1)
+    ) .+ target.centeredness .* invariants.location
+    prior_weights = invariants.location .* target.centeredness .+ exp.(invariants.log_scale .* target.centeredness) .* TDist.(exp.(invariants.log_nu))
     lja += sum_logpdf(prior_weights, weights)
     (;lja, weights)
 end
 
 divide(source::TScaleHierarchy, draws::AbstractVector{<:NamedTuple}) = begin 
-    subsources = [reparametrize(source, (;c1=[c1])) for c1 in source.c1]
-    subdraws = [[merge(draw, (weights=draw.weights[i:i],)) for draw in draws] for i in eachindex(source.c1)]
+    subsources = [reparametrize(source, (;centeredness=[centeredness])) for centeredness in source.centeredness]
+    subdraws = [[merge(draw, (weights=draw.weights[i:i],)) for draw in draws] for i in eachindex(source.centeredness)]
     subsources, subdraws
 end
 recombine(source::TScaleHierarchy, resources) = begin 
