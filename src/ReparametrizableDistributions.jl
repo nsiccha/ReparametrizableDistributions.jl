@@ -1,6 +1,6 @@
 module ReparametrizableDistributions
 
-export LocScaleHierarchy, ScaleHierarchy, MeanShift, GammaSimplex, HSGP, PHSGP, R2D2, Directional, ReparametrizablePosterior, ReparametrizableBSLDP, FixedDistribution
+export LocScaleHierarchy, ScaleHierarchy, TScaleHierarchy, MeanShift, GammaSimplex, HSGP, PHSGP, R2D2, Directional, ReparametrizablePosterior, ReparametrizableBSLDP, FixedDistribution
 
 using WarmupHMC, Distributions, LogDensityProblems, LogExpFunctions
 using SpecialFunctions, HypergeometricFunctions, ChainRulesCore

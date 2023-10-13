@@ -107,12 +107,13 @@ end
 struct TScaleHierarchy{I} <: AbstractReparametrizableDistribution
     info::I
 end
-TScaleHierarchy(log_nu, location, log_scale, c1) = TScaleHierarchy((;log_nu, location, log_scale, c1))
-parts(source::TScaleHierarchy) = (;source.log_nu, source.location, source.log_scale, weights=source.c1)
+TScaleHierarchy(log_nu, log_scale, c1) = TScaleHierarchy((;log_nu, log_scale, c1))
+parts(source::TScaleHierarchy) = (;source.log_nu, source.log_scale, weights=source.c1)
 reparametrization_parameters(source::TScaleHierarchy) = (;source.c1)
 optimization_parameters_fn(::TScaleHierarchy) = finite_logit
 
 lpdf_update(source::TScaleHierarchy, draw::NamedTuple, lpdf=0.) = begin
+    draw = merge(draw, (;location=0.))
     # Mirroring https://num.pyro.ai/en/stable/_modules/numpyro/infer/reparam.html#LocScaleReparam
     # delta = decentered_value - centered * fn.loc
     # value = fn.loc + jnp.power(fn.scale, 1 - centered) * delta
@@ -138,11 +139,11 @@ lpdf_update(source::TScaleHierarchy, draw::NamedTuple, lpdf=0.) = begin
 end
 
 lja_update(::TScaleHierarchy, target::TScaleHierarchy, invariants::NamedTuple, lja=0.) = begin 
+    invariants = merge(invariants, (;location=0.))
     weights = xexpy.(
         invariants.weights .- invariants.location,
         invariants.log_scale .* (target.c1 .- 1)
     ) .+ target.c1 .* invariants.location
-    # tdraw = vcat(invariants.location, invariants.log_scale, tweights)
     prior_weights = invariants.location .* target.c1 .+ exp.(invariants.log_scale .* target.c1) .* TDist.(exp.(invariants.log_nu))
     lja += sum_logpdf(prior_weights, weights)
     (;lja, weights)
