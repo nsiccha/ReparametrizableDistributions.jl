@@ -150,7 +150,7 @@ end
 
 divide(source::TScaleHierarchy, draws::AbstractVector{<:NamedTuple}) = begin 
     subsources = [reparametrize(source, (;c1=[c1])) for c1 in source.c1]
-    subdraws = [[merge(draw, (weights=draw.weights[i:i],))for draw in draws] for i in eachindex(source.c1)]
+    subdraws = [[merge(draw, (weights=draw.weights[i:i],)) for draw in draws] for i in eachindex(source.c1)]
     subsources, subdraws
 end
 recombine(source::TScaleHierarchy, resources) = begin 
