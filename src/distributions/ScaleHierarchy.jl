@@ -128,9 +128,6 @@ lpdf_update(source::TScaleHierarchy, draw::NamedTuple, lpdf=0.) = begin
     if length(source.log_nu) > 0
         lpdf += sum_logpdf(source.log_nu, draw.log_nu)
     end
-    if length(source.location) > 0
-        lpdf += sum_logpdf(source.location, draw.location)
-    end
     if length(source.log_scale) > 0
         lpdf += sum_logpdf(source.log_scale, draw.log_scale)
     end
