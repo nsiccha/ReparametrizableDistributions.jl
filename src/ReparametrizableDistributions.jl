@@ -1,6 +1,8 @@
 module ReparametrizableDistributions
 
-export LocScaleHierarchy, ScaleHierarchy, TScaleHierarchy, MeanShift, GammaSimplex, HSGP, PHSGP, R2D2, Directional, ReparametrizablePosterior, ReparametrizableBSLDP, FixedDistribution
+export LocScaleHierarchy, ScaleHierarchy, TScaleHierarchy, MeanShift, GammaSimplex, HSGP, PHSGP, R2D2, RHS, Directional, ReparametrizablePosterior, ReparametrizableBSLDP, FixedDistribution
+
+export log_transform
 
 using WarmupHMC, Distributions, LogDensityProblems, LogExpFunctions
 using SpecialFunctions, HypergeometricFunctions, ChainRulesCore
@@ -19,6 +21,7 @@ ensure_like(::NamedTuple{names}, rhs) where {names} = NamedTuple{names}((rhs for
 include("utils/StackedArray.jl")
 include("utils/finite_unconstraining.jl")
 include("utils/quantile_and_cdf.jl")
+include("utils/transform.jl")
 include("distributions/AbstractReparametrizableDistribution.jl")
 include("distributions/ScaleHierarchy.jl")
 include("distributions/MeanShift.jl")
@@ -29,6 +32,7 @@ include("distributions/FixedDistribution.jl")
 include("distributions/AbstractCompositeReparametrizableDistribution.jl")
 include("distributions/HSGP.jl")
 include("distributions/R2D2.jl")
+include("distributions/RHS.jl")
 include("distributions/ReparametrizablePosterior.jl")
 include("distributions/ReparametrizableBSLDP.jl")
 

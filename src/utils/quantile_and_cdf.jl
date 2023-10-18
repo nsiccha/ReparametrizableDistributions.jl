@@ -1,4 +1,4 @@
-sum_logpdf(dists, xs) = sum(logpdf.(dists, xs))
+sum_logpdf(dists, xs) = length(dists) > 0 ? sum(logpdf.(dists, xs)) : 0.
 
 _logpdf(distribution, x) = logpdf(distribution, x)
 _cdf(distribution, x) = cdf(distribution, x)
