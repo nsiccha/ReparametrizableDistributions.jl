@@ -4,7 +4,7 @@ end
 RHS(nu_global, nu_local, slab_scale, slab_df, scale_global, centeredness) = RHS((;
     log_c=.5log_transform(slab_scale^2 * InverseGamma(.5slab_df, .5slab_df)),
     log_lambda=fill(log_transform(TDist(nu_local)), size(centeredness)),
-    log_tau=log_transform(TDist(nu_global) * scale_global),
+    log_tau=log_transform(2*scale_global * TDist(nu_global)),
     hierarchy=ScaleHierarchy((), centeredness)
 ))
 parts(source::RHS) = source.info
