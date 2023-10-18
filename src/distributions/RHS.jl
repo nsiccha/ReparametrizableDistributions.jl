@@ -7,7 +7,8 @@ RHS(nu_global, nu_local, slab_scale, slab_df, scale_global, centeredness) = RHS(
     log_tau=log_transform(2*scale_global * TDist(nu_global)),
     hierarchy=ScaleHierarchy((), centeredness)
 ))
-parts(source::RHS) = source.info
+parts(source::RHS) = info(source)
+recombine(source::RHS, reparts::NamedTuple) = RHS(merge(info(source), reparts))
 
 lpdf_update(source::RHS, draw::NamedTuple, lpdf=0.) = begin
     # https://github.com/avehtari/casestudies/blob/967cdb3a6432e8985886b96fda306645fe156a29/Birthdays/gpbf8rhs.stan#L87-L91
