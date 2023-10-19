@@ -49,8 +49,14 @@ lpdf_update(::AbstractReparametrizableDistribution, ::NamedTuple, lpdf=0.) = err
 lja_update(::AbstractReparametrizableDistribution, ::AbstractReparametrizableDistribution, ::NamedTuple, lpdf=0.) = error("unimplemented")
 
 # IMPLEMENTING THIS FOR WarmupHMC.jl
-find_reparametrization(source::AbstractReparametrizableDistribution, draw::AbstractVector{<:NamedTuple}; kwargs...) = 
-    find_reparametrization(:Optim, source, draw; kwargs...)
+find_reparametrization(source::AbstractReparametrizableDistribution, draw::AbstractVector{<:NamedTuple}; kwargs...) = begin 
+    subsources, subdraws = divide(source, draw)
+    if length(subsources) == 1
+        find_reparametrization(:Optim, source, draw; kwargs...)
+    else
+        recombine(source, kmap(find_reparametrization, subsources, subdraws; kwargs...))
+    end
+end
 
 find_reparametrization(source::AbstractReparametrizableDistribution, draws::AbstractMatrix; kwargs...) = recombine(
     source, kmap(find_reparametrization, divide(source, draws)...; kwargs...)
