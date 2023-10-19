@@ -17,16 +17,20 @@ lja_update(source::ScaleHierarchy, target::ScaleHierarchy, draw::NamedTuple, lpd
     (;location=0., draw...), lpdf
 )
 
+slice_if_possible(x::Real, ::Any) = x
+slice_if_possible(x::AbstractVector, i) = length(x) >= i ? x[i:i] : x[1:1]
+
 divide(source::ScaleHierarchy, draws::AbstractVector{<:NamedTuple}) = begin 
     subsources = [
         ScaleHierarchy(source.log_scale, [centeredness])
         for centeredness in source.centeredness
     ]
     subdraws = [
-        [
-            (;draw.log_scale, weights=draw.weights[i:i])
-            for draw in draws
-        ]
+        kmap.(slice_if_possible, draws, i)
+        # [
+        #     (;log_scale=slice_if_possible(draw.log_scale, i), weights=draw.weights[i:i])
+        #     for draw in draws
+        # ]
         for i in eachindex(source.centeredness)
     ]
     subsources, subdraws
@@ -87,10 +91,11 @@ divide(source::LocScaleHierarchy, draws::AbstractVector{<:NamedTuple}) = begin
         for (c1, c2) in zip(source.c1, source.c2)
     ]
     subdraws = [
-        [
-            (;draw.location, draw.log_scale, weights=draw.weights[i:i])
-            for draw in draws
-        ]
+        kmap.(slice_if_possible, draws, i)
+        # [
+        #     (;draw.location, draw.log_scale, weights=draw.weights[i:i])
+        #     for draw in draws
+        # ]
         for i in eachindex(source.c1)
     ]
     subsources, subdraws
@@ -148,7 +153,14 @@ end
 
 divide(source::TScaleHierarchy, draws::AbstractVector{<:NamedTuple}) = begin 
     subsources = [reparametrize(source, (;centeredness=[centeredness])) for centeredness in source.centeredness]
-    subdraws = [[merge(draw, (weights=draw.weights[i:i],)) for draw in draws] for i in eachindex(source.centeredness)]
+    subdraws = [
+        # [
+            kmap.(slice_if_possible, draws, i)
+            # merge(draw, (log_scale=slice_if_possible(draw.log_scale, i), weights=draw.weights[i:i],)) 
+            # for draw in draws
+        # ] 
+        for i in eachindex(source.centeredness)
+    ]
     subsources, subdraws
 end
 recombine(source::TScaleHierarchy, resources) = begin 
