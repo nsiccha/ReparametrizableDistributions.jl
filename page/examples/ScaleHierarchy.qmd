@@ -1,6 +1,10 @@
 ---
-title: "Scale hierarchy reparametrization example"
+title: "Scale hierarchy reparametrization"
+date: 2023/11/08
 ---
+
+Finding the best centeredness for a scale hierarchy.
+
 ```{julia}
 
 using Optim, ReverseDiff, Random, Distributions
