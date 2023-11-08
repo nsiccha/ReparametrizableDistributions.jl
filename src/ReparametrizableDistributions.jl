@@ -1,6 +1,6 @@
 module ReparametrizableDistributions
 
-export LocScaleHierarchy, ScaleHierarchy, TScaleHierarchy, MeanShift, GammaSimplex, HSGP, PHSGP, R2D2, RHS, Directional, ReparametrizablePosterior, ReparametrizableBSLDP, FixedDistribution
+export LocScaleHierarchy, ScaleHierarchy, TScaleHierarchy, MeanShift, GammaSimplex, HSGP, PHSGP, R2D2, RHS, Directional, ReparametrizablePosterior, ReparametrizableBSLDP, FixedDistribution, find_reparametrization
 
 export log_transform
 

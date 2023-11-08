@@ -1,0 +1,33 @@
+project:
+  type: website
+  execute-dir: file
+author: "Nikolas Siccha"
+toc: true
+toc-expand: true
+toc-location: right
+number-sections: true
+website:
+  title: "ReparametrizableDistributions.jl"
+  site-url: https://nsiccha.github.io/ReparametrizableDistributions.jl
+  navbar:
+    right:
+      - icon: github
+        href: https://github.com/nsiccha/ReparametrizableDistributions.jl
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    code-line-numbers: true
+    code-tools: true
+    page-layout: full
+jupyter: julia-8t-1.9
+execute:
+  freeze: auto
+  daemon: 3600
+  error: true
+  cache: true
+freeze: true
+title-block-banner: true
+filters:
+   - lightbox
+lightbox: auto
