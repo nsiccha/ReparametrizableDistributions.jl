@@ -162,12 +162,6 @@ git-tree-sha1 = "5837a837389fccf076445fce071c8ddaea35a566"
 uuid = "fa6b7ba4-c1ee-5f82-b5fc-ecf0adba8f74"
 version = "0.6.8"
 
-[[deps.DynamicObjects]]
-deps = ["Serialization"]
-git-tree-sha1 = "685f7b597bb8fd7dd9017a299c2045f7472d9798"
-uuid = "23d02862-63fe-4c6e-8fdb-1d52cbbd39d5"
-version = "0.1.6"
-
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
@@ -619,8 +613,8 @@ uuid = "3d5dd08c-fd9d-11e8-17fa-ed2836048c2f"
 version = "0.21.64"
 
 [[deps.WarmupHMC]]
-deps = ["Distributions", "DynamicObjects", "LinearAlgebra", "LogDensityProblems", "NaNStatistics", "Random", "UnPack"]
-git-tree-sha1 = "5462c2af938e5f727d84db7f31b51e1e9e0e4ee8"
+deps = ["Distributions", "LinearAlgebra", "LogDensityProblems", "NaNStatistics", "Random", "UnPack"]
+git-tree-sha1 = "bdfc4f7121dec16a57af760e6ae574259c66612e"
 repo-rev = "main"
 repo-url = "https://github.com/nsiccha/WarmupHMC.jl"
 uuid = "60658175-6863-4866-a322-ab51a11c0cfe"
@@ -628,12 +622,10 @@ version = "0.1.0"
 
     [deps.WarmupHMC.extensions]
     WarmupHMCDynamicHMCExt = "DynamicHMC"
-    WarmupHMCLogDensityProblemsADExt = "LogDensityProblemsAD"
     WarmupHMCOptimReverseDiffExt = ["Optim", "ReverseDiff"]
 
     [deps.WarmupHMC.weakdeps]
     DynamicHMC = "bbc10e6e-7c05-544b-b16e-64fede858acb"
-    LogDensityProblemsAD = "996a588d-648d-4e1f-a8f0-a84b347e47b1"
     Optim = "429524aa-4258-5aef-a3af-852621145aeb"
     ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
 

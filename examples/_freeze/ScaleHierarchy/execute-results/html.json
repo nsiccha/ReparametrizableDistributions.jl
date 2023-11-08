@@ -1,0 +1,11 @@
+{
+  "hash": "91b0f752f5b27c3fed8ebebc4f03c708",
+  "result": {
+    "markdown": "---\ntitle: \"Scale hierarchy reparametrization example\"\n---\n\n::: {.cell execution_count=1}\n``` {.julia .cell-code}\nusing Optim, ReverseDiff, Random, Distributions\n\nusing ReparametrizableDistributions\n\nusing DynamicPlots\n \nrng = Xoshiro(0)\n\nn_parameters = 999\nn_draws = 1000\n\n\nlog_scales = rand(rng, Normal(), (n_parameters, n_draws))\nxi = rand(rng, Normal(), (n_parameters, n_draws))\nx = exp.(log_scales) .* xi\n\nscale_hierarchy = ScaleHierarchy([], ones(n_parameters))\n\n@time result = find_reparametrization(scale_hierarchy, [\n    (;log_scale, weights)\n    for (log_scale, weights) in zip(eachcol(log_scales), eachcol(x))\n])\n\nECDFPlot(result.centeredness, xlabel=\"centeredness\", label=\"estimated\") + Vline([0], label=\"ideal\")\n```\n\n::: {.cell-output .cell-output-error}\n```\nLoadError: UndefVarError: `find_reparametrization` not defined\n```\n:::\n:::\n\n\n",
+    "supporting": [
+      "ScaleHierarchy_files/figure-html"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

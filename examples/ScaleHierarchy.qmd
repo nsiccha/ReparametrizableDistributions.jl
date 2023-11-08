@@ -1,0 +1,30 @@
+---
+title: "Scale hierarchy reparametrization example"
+---
+```{julia}
+
+using Optim, ReverseDiff, Random, Distributions
+
+using ReparametrizableDistributions
+
+using DynamicPlots
+ 
+rng = Xoshiro(0)
+
+n_parameters = 999
+n_draws = 1000
+
+
+log_scales = rand(rng, Normal(), (n_parameters, n_draws))
+xi = rand(rng, Normal(), (n_parameters, n_draws))
+x = exp.(log_scales) .* xi
+
+scale_hierarchy = ScaleHierarchy([], ones(n_parameters))
+
+@time result = find_reparametrization(scale_hierarchy, [
+    (;log_scale, weights)
+    for (log_scale, weights) in zip(eachcol(log_scales), eachcol(x))
+])
+
+ECDFPlot(result.centeredness, xlabel="centeredness", label="estimated") + Vline([0], label="ideal")
+``` 
