@@ -958,7 +958,7 @@ version = "1.0.1"
 
 [[deps.ReparametrizableDistributions]]
 deps = ["BridgeStan", "ChainRulesCore", "Distributions", "HypergeometricFunctions", "JSON", "LogDensityProblems", "LogDensityProblemsAD", "LogExpFunctions", "SpecialFunctions", "WarmupHMC"]
-git-tree-sha1 = "078851d67a0e79fd60b3b7b8a89021f82af97524"
+git-tree-sha1 = "2f45a95622d268b5a554ced2e98ac78e1e3bec99"
 repo-rev = "main"
 repo-url = "https://github.com/nsiccha/ReparametrizableDistributions.jl"
 uuid = "7d03e222-df96-4b80-bcdc-d089be88b5f2"

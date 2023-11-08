@@ -6,8 +6,6 @@ title: "Scale hierarchy reparametrization example"
 using Optim, ReverseDiff, Random, Distributions
 
 using ReparametrizableDistributions
-
-using DynamicPlots
  
 rng = Xoshiro(0)
 
@@ -24,7 +22,11 @@ scale_hierarchy = ScaleHierarchy([], ones(n_parameters))
 @time result = find_reparametrization(scale_hierarchy, [
     (;log_scale, weights)
     for (log_scale, weights) in zip(eachcol(log_scales), eachcol(x))
-])
-
-ECDFPlot(result.centeredness, xlabel="centeredness", label="estimated") + Vline([0], label="ideal")
+]);
+ 
+```
+The below visualization needs the DynamicPlots package. 
+```{julia}
+using DynamicPlots 
+ECDFPlot(result.centeredness, xlabel="centeredness", label="estimated") + Vline([0], label="ideal") 
 ``` 
