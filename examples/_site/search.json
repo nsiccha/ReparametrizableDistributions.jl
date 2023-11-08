@@ -1,0 +1,16 @@
+[
+  {
+    "objectID": "ScaleHierarchy.html",
+    "href": "ScaleHierarchy.html",
+    "title": "Scale hierarchy reparametrization example",
+    "section": "",
+    "text": "using Optim, ReverseDiff, Random, Distributions\n\nusing ReparametrizableDistributions\n\nusing DynamicPlots\n \nrng = Xoshiro(0)\n\nn_parameters = 999\nn_draws = 1000\n\n\nlog_scales = rand(rng, Normal(), (n_parameters, n_draws))\nxi = rand(rng, Normal(), (n_parameters, n_draws))\nx = exp.(log_scales) .* xi\n\nscale_hierarchy = ScaleHierarchy([], ones(n_parameters))\n\n@time result = find_reparametrization(scale_hierarchy, [\n    (;log_scale, weights)\n    for (log_scale, weights) in zip(eachcol(log_scales), eachcol(x))\n])\n\nECDFPlot(result.centeredness, xlabel=\"centeredness\", label=\"estimated\") + Vline([0], label=\"ideal\")\n\nLoadError: UndefVarError: `find_reparametrization` not defined"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "",
+    "section": "",
+    "text": "Code\n\n\n\n\n1 Installation\nInitialize julia project if not done yet, see e.g. https://pkgdocs.julialang.org/v1/environments/.\nIn short, something like:\n# Start julia REPL with project defined in current directory\njulia --project=.\n # Enter julia package manager\n]\n# Add registered external packages\nadd Optim ReverseDiff Random Distributions \n# Add reparametrization package\nadd https://github.com/nsiccha/ReparametrizableDistributions.jl  \n\n\n2 Examples\n\nScaleHierarchy.qmd!"
+  }
+]
