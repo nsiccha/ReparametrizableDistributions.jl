@@ -16,7 +16,6 @@ website:
 format:
   html:
     theme: cosmo
-    css: styles.css
     code-line-numbers: true
     code-tools: true
     page-layout: full
