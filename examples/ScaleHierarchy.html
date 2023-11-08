@@ -7,8 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Nikolas Siccha">
+<meta name="dcterms.date" content="2023-11-08">
 
-<title>ReparametrizableDistributions.jl</title>
+<title>ReparametrizableDistributions.jl - Scale hierarchy reparametrization</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -58,24 +59,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -96,38 +98,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
 
@@ -138,7 +109,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">ReparametrizableDistributions.jl</span>
     </a>
   </div>
@@ -161,83 +132,90 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-page">
+      <div class="quarto-title-block"><div><h1 class="title">Scale hierarchy reparametrization</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Nikolas Siccha </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 8, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation"><span class="header-section-number">1</span> Installation</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples"><span class="header-section-number">2</span> Examples</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content"><div class="quarto-title-block"><div class="quarto-title-tools-only"><h1></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<main class="content quarto-banner-title-block column-page" id="quarto-document-content">
 
 
 
-<section id="installation" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Installation</h1>
-<p>Initialize julia project if not done yet, see e.g.&nbsp;<a href="https://pkgdocs.julialang.org/v1/environments/">https://pkgdocs.julialang.org/v1/environments/</a>.</p>
-<p>In short, something like:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Start julia REPL with project defined in current directory</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="ex">julia</span> <span class="at">--project</span><span class="op">=</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>From that REPL, run:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource julia number-lines code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1"></a> <span class="co"># Enter julia package manager</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a>]</span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co"># Add registered external packages</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a>add Optim ReverseDiff <span class="bu">Random</span> Distributions </span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="co"># Add reparametrization package</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a>add https<span class="op">://</span>github.com<span class="op">/</span>nsiccha<span class="op">/</span>ReparametrizableDistributions.jl  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>After doing that, you should be able to run one of the examples below.</p>
-</section>
-<section id="examples" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Examples</h1>
 
+<p>Finding the best centeredness for a scale hierarchy.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource julia number-lines code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">using</span> <span class="bu">Optim</span>, <span class="bu">ReverseDiff</span>, <span class="bu">Random</span>, <span class="bu">Distributions</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">using</span> <span class="bu">ReparametrizableDistributions</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a> </span>
+<span id="cb1-5"><a href="#cb1-5"></a>rng <span class="op">=</span> <span class="fu">Xoshiro</span>(<span class="fl">0</span>)</span>
+<span id="cb1-6"><a href="#cb1-6"></a></span>
+<span id="cb1-7"><a href="#cb1-7"></a>n_parameters <span class="op">=</span> <span class="fl">999</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>n_draws <span class="op">=</span> <span class="fl">1000</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a></span>
+<span id="cb1-10"><a href="#cb1-10"></a></span>
+<span id="cb1-11"><a href="#cb1-11"></a>log_scales <span class="op">=</span> <span class="fu">rand</span>(rng, <span class="fu">Normal</span>(), (n_parameters, n_draws))</span>
+<span id="cb1-12"><a href="#cb1-12"></a>xi <span class="op">=</span> <span class="fu">rand</span>(rng, <span class="fu">Normal</span>(), (n_parameters, n_draws))</span>
+<span id="cb1-13"><a href="#cb1-13"></a>x <span class="op">=</span> <span class="fu">exp</span>.(log_scales) <span class="op">.*</span> xi</span>
+<span id="cb1-14"><a href="#cb1-14"></a></span>
+<span id="cb1-15"><a href="#cb1-15"></a>scale_hierarchy <span class="op">=</span> <span class="fu">ScaleHierarchy</span>([], <span class="fu">ones</span>(n_parameters))</span>
+<span id="cb1-16"><a href="#cb1-16"></a></span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="pp">@time</span> result <span class="op">=</span> <span class="fu">find_reparametrization</span>(scale_hierarchy, [</span>
+<span id="cb1-18"><a href="#cb1-18"></a>    (;log_scale, weights)</span>
+<span id="cb1-19"><a href="#cb1-19"></a>    for (log_scale, weights) <span class="kw">in</span> <span class="fu">zip</span>(<span class="fu">eachcol</span>(log_scales), <span class="fu">eachcol</span>(x))</span>
+<span id="cb1-20"><a href="#cb1-20"></a>]);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> 26.111660 seconds (172.92 M allocations: 10.167 GiB, 6.06% gc time, 75.52% compilation time)</code></pre>
+</div>
+</div>
+<p>The below visualization needs the DynamicPlots package.</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource julia number-lines code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1"></a><span class="im">using</span> <span class="bu">DynamicPlots </span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">ECDFPlot</span>(result.centeredness, xlabel<span class="op">=</span><span class="st">"centeredness"</span>, label<span class="op">=</span><span class="st">"estimated"</span>) <span class="op">+</span> <span class="fu">Vline</span>([<span class="fl">0</span>], label<span class="op">=</span><span class="st">"ideal"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="./figs/11115396582557277124.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="./figs/11115396582557277124.png" class="img-fluid figure-img"></a></p>
+</figure>
+</div>
+</div>
+</div>
 
 
 <!-- -->
 
-</section>
 
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-listing-date-sort="1699394400000" data-listing-file-modified-sort="1699453775832" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1">
-<div class="thumbnail">
-<p><a href="./examples/ScaleHierarchy.html"> <p class="card-img-top"><img src="examples/figs/11115396582557277124.png"  class="thumbnail-image card-img"/></p> </a></p>
-</div>
-<div class="body">
-<a href="./examples/ScaleHierarchy.html">
-<h3 class="no-anchor listing-title">
-Scale hierarchy reparametrization
-</h3>
-<div class="listing-subtitle">
-
-</div>
-<div class="listing-description">
-Finding the best centeredness for a scale hierarchy.
-</div>
-</a>
-</div>
-<div class="metadata">
-<a href="./examples/ScaleHierarchy.html">
-<div class="listing-date">
-Nov 8, 2023
-</div>
-<div class="listing-author">
-Nikolas Siccha
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -522,36 +500,45 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1"></a><span class="co">---</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="an">listing:</span></span>
-<span id="cb3-3"><a href="#cb3-3"></a><span class="co">  contents: examples</span></span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="co">---</span></span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="fu"># Installation</span></span>
-<span id="cb3-6"><a href="#cb3-6"></a></span>
-<span id="cb3-7"><a href="#cb3-7"></a>Initialize julia project if not done yet, see e.g. <span class="co">[</span><span class="ot">https://pkgdocs.julialang.org/v1/environments/</span><span class="co">](https://pkgdocs.julialang.org/v1/environments/)</span>.</span>
-<span id="cb3-8"><a href="#cb3-8"></a></span>
-<span id="cb3-9"><a href="#cb3-9"></a>In short, something like:</span>
-<span id="cb3-10"><a href="#cb3-10"></a></span>
-<span id="cb3-11"><a href="#cb3-11"></a><span class="in">```{.bash}</span></span>
-<span id="cb3-12"><a href="#cb3-12"></a><span class="co"># Start julia REPL with project defined in current directory</span></span>
-<span id="cb3-13"><a href="#cb3-13"></a><span class="ex">julia</span> <span class="at">--project</span><span class="op">=</span>.</span>
-<span id="cb3-14"><a href="#cb3-14"></a><span class="in">```</span></span>
-<span id="cb3-15"><a href="#cb3-15"></a>From that REPL, run:</span>
-<span id="cb3-16"><a href="#cb3-16"></a><span class="in">```{.julia}</span></span>
-<span id="cb3-17"><a href="#cb3-17"></a> <span class="co"># Enter julia package manager</span></span>
-<span id="cb3-18"><a href="#cb3-18"></a>]</span>
-<span id="cb3-19"><a href="#cb3-19"></a><span class="co"># Add registered external packages</span></span>
-<span id="cb3-20"><a href="#cb3-20"></a>add Optim ReverseDiff Random Distributions </span>
-<span id="cb3-21"><a href="#cb3-21"></a><span class="co"># Add reparametrization package</span></span>
-<span id="cb3-22"><a href="#cb3-22"></a>add https://github.com/nsiccha/ReparametrizableDistributions.jl  </span>
-<span id="cb3-23"><a href="#cb3-23"></a><span class="in">```</span></span>
-<span id="cb3-24"><a href="#cb3-24"></a></span>
-<span id="cb3-25"><a href="#cb3-25"></a>After doing that, you should be able to run one of the examples below.</span>
-<span id="cb3-26"><a href="#cb3-26"></a></span>
-<span id="cb3-27"><a href="#cb3-27"></a><span class="fu"># Examples</span></span>
-<span id="cb3-28"><a href="#cb3-28"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4" data-shortcodes="false"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1"></a><span class="co">---</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="an">title:</span><span class="co"> "Scale hierarchy reparametrization"</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="an">date:</span><span class="co"> 2023/11/08</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">---</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a></span>
+<span id="cb4-6"><a href="#cb4-6"></a>Finding the best centeredness for a scale hierarchy.</span>
+<span id="cb4-7"><a href="#cb4-7"></a></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="in">```{julia}</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>using Optim, ReverseDiff, Random, Distributions</span>
+<span id="cb4-12"><a href="#cb4-12"></a></span>
+<span id="cb4-13"><a href="#cb4-13"></a>using ReparametrizableDistributions</span>
+<span id="cb4-14"><a href="#cb4-14"></a> </span>
+<span id="cb4-15"><a href="#cb4-15"></a>rng = Xoshiro(<span class="dv">0</span>)</span>
+<span id="cb4-16"><a href="#cb4-16"></a></span>
+<span id="cb4-17"><a href="#cb4-17"></a>n_parameters = <span class="dv">999</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a>n_draws = <span class="dv">1000</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a></span>
+<span id="cb4-20"><a href="#cb4-20"></a></span>
+<span id="cb4-21"><a href="#cb4-21"></a>log_scales = <span class="fu">rand</span>(rng, Normal(), (n_parameters, n_draws))</span>
+<span id="cb4-22"><a href="#cb4-22"></a>xi = <span class="fu">rand</span>(rng, Normal(), (n_parameters, n_draws))</span>
+<span id="cb4-23"><a href="#cb4-23"></a>x = <span class="fu">exp</span>.(log_scales) .<span class="ot">*</span> xi</span>
+<span id="cb4-24"><a href="#cb4-24"></a></span>
+<span id="cb4-25"><a href="#cb4-25"></a>scale_hierarchy = ScaleHierarchy([], ones(n_parameters))</span>
+<span id="cb4-26"><a href="#cb4-26"></a></span>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="dt">@time</span> result = find_reparametrization(scale_hierarchy, [</span>
+<span id="cb4-28"><a href="#cb4-28"></a>    (;log_scale, weights)</span>
+<span id="cb4-29"><a href="#cb4-29"></a>    <span class="kw">for</span> (log_scale, weights) in zip(eachcol(log_scales), eachcol(x))</span>
+<span id="cb4-30"><a href="#cb4-30"></a>]);</span>
+<span id="cb4-31"><a href="#cb4-31"></a> </span>
+<span id="cb4-32"><a href="#cb4-32"></a><span class="in">```</span></span>
+<span id="cb4-33"><a href="#cb4-33"></a>The below visualization needs the DynamicPlots package. </span>
+<span id="cb4-36"><a href="#cb4-36"></a><span class="in">```{julia}</span></span>
+<span id="cb4-37"><a href="#cb4-37"></a>using DynamicPlots </span>
+<span id="cb4-38"><a href="#cb4-38"></a>ECDFPlot(result.centeredness, xlabel=<span class="ot">"</span><span class="st">centeredness</span><span class="ot">"</span>, label=<span class="ot">"</span><span class="st">estimated</span><span class="ot">"</span>) + Vline([<span class="dv">0</span>], label=<span class="ot">"</span><span class="st">ideal</span><span class="ot">"</span>) </span>
+<span id="cb4-39"><a href="#cb4-39"></a><span class="in">```</span> </span>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","loop":true,"descPosition":"bottom","openEffect":"zoom","closeEffect":"zoom"});</script>
 
 
 
