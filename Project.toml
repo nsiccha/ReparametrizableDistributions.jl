@@ -1,7 +1,7 @@
 name = "ReparametrizableDistributions"
 uuid = "7d03e222-df96-4b80-bcdc-d089be88b5f2"
 authors = ["Nikolas Siccha <nikolas.siccha@aalto.fi>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 BridgeStan = "c88b6f0a-829e-4b0b-94b7-f06ab5908f5a"
