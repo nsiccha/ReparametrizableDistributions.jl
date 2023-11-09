@@ -16,6 +16,16 @@ SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 WarmupHMC = "60658175-6863-4866-a322-ab51a11c0cfe"
 
 [compat]
+julia = "1.9"
+BridgeStan = "2.2.1"
+ChainRulesCore = "1.16.0"
+Distributions = "0.25.100"
+HypergeometricFunctions = "0.3.23"
+JSON = "0.21.4"
+LogDensityProblems = "2.1.1"
+LogDensityProblemsAD = "1.6.1"
+LogExpFunctions = "0.3.26"
+SpecialFunctions = "2.3.1"
 WarmupHMC = "0.1.1"
 
 [weakdeps]
