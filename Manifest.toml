@@ -614,11 +614,11 @@ version = "0.21.64"
 
 [[deps.WarmupHMC]]
 deps = ["Distributions", "LinearAlgebra", "LogDensityProblems", "NaNStatistics", "Random", "UnPack"]
-git-tree-sha1 = "bdfc4f7121dec16a57af760e6ae574259c66612e"
+git-tree-sha1 = "73caee064038296d9591088052c652b0f93596e2"
 repo-rev = "main"
 repo-url = "https://github.com/nsiccha/WarmupHMC.jl"
 uuid = "60658175-6863-4866-a322-ab51a11c0cfe"
-version = "0.1.0"
+version = "0.1.1"
 
     [deps.WarmupHMC.extensions]
     WarmupHMCDynamicHMCExt = "DynamicHMC"
