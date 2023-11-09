@@ -16,7 +16,7 @@ SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 WarmupHMC = "60658175-6863-4866-a322-ab51a11c0cfe"
 
 [compat]
-WarmupHMC = "0.1.1
+WarmupHMC = "0.1.1"
 
 [weakdeps]
 ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
