@@ -35,5 +35,6 @@ include("distributions/R2D2.jl")
 include("distributions/RHS.jl")
 include("distributions/ReparametrizablePosterior.jl")
 include("distributions/ReparametrizableBSLDP.jl")
+include("utils/convenience.jl")
 
 end # module ReparametrizableDistributions

@@ -27,6 +27,8 @@ scale_hierarchy = ScaleHierarchy([], ones(n_parameters))
     (;log_scale, weights)
     for (log_scale, weights) in zip(eachcol(log_scales), eachcol(x))
 ]);
+
+centeredness = ReparametrizableDistributions.find_centeredness(log_scales=log_scales, x=x, ones(n_parameters))
  
 ```
 The below visualization needs the DynamicPlots package. 
