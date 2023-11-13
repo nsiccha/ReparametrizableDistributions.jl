@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.361">
+<meta name="generator" content="quarto-1.3.353">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -92,8 +92,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
+    "search-submit-button-title": "Submit"
   }
 }</script>
 <script>
@@ -169,8 +168,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation"><span class="header-section-number">1</span> Installation</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples"><span class="header-section-number">2</span> Examples</a></li>
+  <li><a href="#reparametrizabledistributions.jl" id="toc-reparametrizabledistributions.jl" class="nav-link active" data-scroll-target="#reparametrizabledistributions.jl"><span class="header-section-number">1</span> ReparametrizableDistributions.jl</a>
+  <ul class="collapse">
+  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation"><span class="header-section-number">1.1</span> Installation</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples"><span class="header-section-number">1.2</span> Examples</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -179,8 +181,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="installation" class="level1" data-number="1">
-<h1 data-number="1"><span class="header-section-number">1</span> Installation</h1>
+<section id="reparametrizabledistributions.jl" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> ReparametrizableDistributions.jl</h1>
+<p>Implements functionality to reparametrize distributions/posteriors to make them easier to sample from using MCMC methods.</p>
+<section id="installation" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="installation"><span class="header-section-number">1.1</span> Installation</h2>
 <p>Initialize julia project if not done yet, see e.g.&nbsp;<a href="https://pkgdocs.julialang.org/v1/environments/">https://pkgdocs.julialang.org/v1/environments/</a>.</p>
 <p>In short, something like:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Start julia REPL with project defined in current directory</span></span>
@@ -192,22 +197,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-4"><a href="#cb2-4"></a>add Optim ReverseDiff <span class="bu">Random</span> Distributions </span>
 <span id="cb2-5"><a href="#cb2-5"></a><span class="co"># Add reparametrization package</span></span>
 <span id="cb2-6"><a href="#cb2-6"></a>add https<span class="op">://</span>github.com<span class="op">/</span>nsiccha<span class="op">/</span>ReparametrizableDistributions.jl  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>After doing that, you should be able to run one of the examples below.</p>
+<p>After doing that, you should be able to run one of the examples at <a href="https://nsiccha.github.io/ReparametrizableDistributions.jl/">https://nsiccha.github.io/ReparametrizableDistributions.jl/</a>.</p>
 </section>
-<section id="examples" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Examples</h1>
+<section id="examples" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="examples"><span class="header-section-number">1.2</span> Examples</h2>
 
 
 
 <!-- -->
 
 </section>
+</section>
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-listing-date-sort="1699394400000" data-listing-file-modified-sort="1699453775832" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1">
+<div class="quarto-post image-right" data-index="0" data-listing-date-sort="1699826400000" data-listing-file-modified-sort="1699866929033" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1">
 <div class="thumbnail">
-<p><a href="./examples/ScaleHierarchy.html"> <p class="card-img-top"><img src="examples/figs/11115396582557277124.png"  class="thumbnail-image card-img"/></p> </a></p>
+<p><a href="./examples/ScaleHierarchy.html"> <p class="card-img-top"><img src="examples/figs/9405796391769734077.png"  class="thumbnail-image card-img"/></p> </a></p>
 </div>
 <div class="body">
 <a href="./examples/ScaleHierarchy.html">
@@ -218,14 +224,14 @@ Scale hierarchy reparametrization
 
 </div>
 <div class="listing-description">
-Finding the best centeredness for a scale hierarchy.
+Finding the best centeredness for a scale hierarchy using independent draws from a funnel.
 </div>
 </a>
 </div>
 <div class="metadata">
 <a href="./examples/ScaleHierarchy.html">
 <div class="listing-date">
-Nov 8, 2023
+Nov 13, 2023
 </div>
 <div class="listing-author">
 Nikolas Siccha
@@ -526,30 +532,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb3-2"><a href="#cb3-2"></a><span class="an">listing:</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a><span class="co">  contents: examples</span></span>
 <span id="cb3-4"><a href="#cb3-4"></a><span class="co">---</span></span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="fu"># Installation</span></span>
-<span id="cb3-6"><a href="#cb3-6"></a></span>
-<span id="cb3-7"><a href="#cb3-7"></a>Initialize julia project if not done yet, see e.g. <span class="co">[</span><span class="ot">https://pkgdocs.julialang.org/v1/environments/</span><span class="co">](https://pkgdocs.julialang.org/v1/environments/)</span>.</span>
-<span id="cb3-8"><a href="#cb3-8"></a></span>
-<span id="cb3-9"><a href="#cb3-9"></a>In short, something like:</span>
-<span id="cb3-10"><a href="#cb3-10"></a></span>
-<span id="cb3-11"><a href="#cb3-11"></a><span class="in">```{.bash}</span></span>
-<span id="cb3-12"><a href="#cb3-12"></a><span class="co"># Start julia REPL with project defined in current directory</span></span>
-<span id="cb3-13"><a href="#cb3-13"></a><span class="ex">julia</span> <span class="at">--project</span><span class="op">=</span>.</span>
-<span id="cb3-14"><a href="#cb3-14"></a><span class="in">```</span></span>
-<span id="cb3-15"><a href="#cb3-15"></a>From that REPL, run:</span>
-<span id="cb3-16"><a href="#cb3-16"></a><span class="in">```{.julia}</span></span>
-<span id="cb3-17"><a href="#cb3-17"></a> <span class="co"># Enter julia package manager</span></span>
-<span id="cb3-18"><a href="#cb3-18"></a>]</span>
-<span id="cb3-19"><a href="#cb3-19"></a><span class="co"># Add registered external packages</span></span>
-<span id="cb3-20"><a href="#cb3-20"></a>add Optim ReverseDiff Random Distributions </span>
-<span id="cb3-21"><a href="#cb3-21"></a><span class="co"># Add reparametrization package</span></span>
-<span id="cb3-22"><a href="#cb3-22"></a>add https://github.com/nsiccha/ReparametrizableDistributions.jl  </span>
-<span id="cb3-23"><a href="#cb3-23"></a><span class="in">```</span></span>
-<span id="cb3-24"><a href="#cb3-24"></a></span>
-<span id="cb3-25"><a href="#cb3-25"></a>After doing that, you should be able to run one of the examples below.</span>
-<span id="cb3-26"><a href="#cb3-26"></a></span>
-<span id="cb3-27"><a href="#cb3-27"></a><span class="fu"># Examples</span></span>
-<span id="cb3-28"><a href="#cb3-28"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6"></a>{{&lt; include ../README.md &gt;}}</span>
+<span id="cb3-7"><a href="#cb3-7"></a></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="fu">## Examples</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

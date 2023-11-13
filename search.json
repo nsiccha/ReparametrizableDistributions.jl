@@ -1,16 +1,51 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "",
-    "section": "",
-    "text": "Code\n\n\n\n\n1 Installation\nInitialize julia project if not done yet, see e.g. https://pkgdocs.julialang.org/v1/environments/.\nIn short, something like:\n# Start julia REPL with project defined in current directory\njulia --project=.\nFrom that REPL, run:\n # Enter julia package manager\n]\n# Add registered external packages\nadd Optim ReverseDiff Random Distributions \n# Add reparametrization package\nadd https://github.com/nsiccha/ReparametrizableDistributions.jl  \nAfter doing that, you should be able to run one of the examples below.\n\n\n2 Examples\n\n\n\n\n\n\n\n\n\n\n\n  \n\n\n\n\nScale hierarchy reparametrization\n\n\n\n\n\n\n\n\n\n\n\n\nNov 8, 2023\n\n\nNikolas Siccha\n\n\n\n\n\n\nNo matching items"
-  },
-  {
     "objectID": "examples/ScaleHierarchy.html",
     "href": "examples/ScaleHierarchy.html",
     "title": "Scale hierarchy reparametrization",
     "section": "",
-    "text": "Finding the best centeredness for a scale hierarchy.\n\nusing Optim, ReverseDiff, Random, Distributions\n\nusing ReparametrizableDistributions\n \nrng = Xoshiro(0)\n\nn_parameters = 999\nn_draws = 1000\n\n\nlog_scales = rand(rng, Normal(), (n_parameters, n_draws))\nxi = rand(rng, Normal(), (n_parameters, n_draws))\nx = exp.(log_scales) .* xi\n\nscale_hierarchy = ScaleHierarchy([], ones(n_parameters))\n\n@time result = find_reparametrization(scale_hierarchy, [\n    (;log_scale, weights)\n    for (log_scale, weights) in zip(eachcol(log_scales), eachcol(x))\n]);\n\n 26.111660 seconds (172.92 M allocations: 10.167 GiB, 6.06% gc time, 75.52% compilation time)\n\n\nThe below visualization needs the DynamicPlots package.\n\nusing DynamicPlots \nECDFPlot(result.centeredness, xlabel=\"centeredness\", label=\"estimated\") + Vline([0], label=\"ideal\")"
+    "text": "Finding the best centeredness for a scale hierarchy using independent draws from a funnel."
+  },
+  {
+    "objectID": "examples/ScaleHierarchy.html#independently-sampling-from-the-funnel",
+    "href": "examples/ScaleHierarchy.html#independently-sampling-from-the-funnel",
+    "title": "Scale hierarchy reparametrization",
+    "section": "1 Independently sampling from the funnel",
+    "text": "1 Independently sampling from the funnel\n\nusing Random, Distributions, DynamicPlots\n \nrng = Xoshiro(0)\n\nn_parameters = 999\nn_draws = 1000\n\nlog_scales = rand(rng, Normal(), (n_parameters, n_draws))\nxi = rand(rng, Normal(), (n_parameters, n_draws))\nx = exp.(log_scales) .* xi\n\nFigure([\n    Scatter(x[1, :], log_scales[1, :], xlabel=\"x1\", ylabel=\"log scale\", title=\"\\ncentered\"),\n    Scatter(xi[1, :], log_scales[1, :], xlabel=\"xi1\", ylabel=\"log scale\", title=\"\\nnon-centered\"),\n], plot_title=\"Centered vs non-centered parametrization\")'"
+  },
+  {
+    "objectID": "examples/ScaleHierarchy.html#reparametrizing-the-funnel",
+    "href": "examples/ScaleHierarchy.html#reparametrizing-the-funnel",
+    "title": "Scale hierarchy reparametrization",
+    "section": "2 Reparametrizing the funnel",
+    "text": "2 Reparametrizing the funnel\n\n# Currently, the three below \"imports\" are needed \nusing Optim, ReverseDiff, ReparametrizableDistributions\n\n@time centeredness = ReparametrizableDistributions.find_centeredness(\n    log_scales, x, ones(n_parameters)\n)\n\n  9.470785 seconds (113.62 M allocations: 6.652 GiB, 7.58% gc time)\n\n\n999-element Vector{Float64}:\n 2.3156357906887656e-22\n 0.017878737637845626\n 0.03662184969475224\n 0.008456942923537944\n 0.0055571275045578575\n 0.005243951369869717\n 2.3156357906887656e-22\n 0.030383850903036903\n 0.014625922840439584\n 0.03942034885844935\n 0.012131204761371578\n 2.3156357906887656e-22\n 0.01361161095616389\n ⋮\n 0.021224630352922078\n 2.3156357906887656e-22\n 2.3156357906887656e-22\n 0.008097934782206814\n 2.3156357906887656e-22\n 0.00731797366736444\n 0.018932120075084234\n 2.3156357906887656e-22\n 2.3156357906887656e-22\n 2.3156357906887656e-22\n 2.3156357906887656e-22\n 0.03181136653127193"
+  },
+  {
+    "objectID": "examples/ScaleHierarchy.html#visualizing-the-found-parametrization-parameters",
+    "href": "examples/ScaleHierarchy.html#visualizing-the-found-parametrization-parameters",
+    "title": "Scale hierarchy reparametrization",
+    "section": "3 Visualizing the found parametrization parameters",
+    "text": "3 Visualizing the found parametrization parameters\n\nusing DynamicPlots \nECDFPlot(centeredness, xlabel=\"centeredness\", label=\"estimated\") + Vline([0], label=\"ideal\") \n\n\n\n\n\n\n\n\n(The above visualizations uses the DynamicPlots package, but any other plotting packages works as well or better.)"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "",
+    "section": "",
+    "text": "Code"
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "",
+    "section": "1.1 Installation",
+    "text": "1.1 Installation\nInitialize julia project if not done yet, see e.g. https://pkgdocs.julialang.org/v1/environments/.\nIn short, something like:\n# Start julia REPL with project defined in current directory\njulia --project=.\nFrom that REPL, run:\n # Enter julia package manager\n]\n# Add registered external packages\nadd Optim ReverseDiff Random Distributions \n# Add reparametrization package\nadd https://github.com/nsiccha/ReparametrizableDistributions.jl  \nAfter doing that, you should be able to run one of the examples at https://nsiccha.github.io/ReparametrizableDistributions.jl/."
+  },
+  {
+    "objectID": "index.html#examples",
+    "href": "index.html#examples",
+    "title": "",
+    "section": "1.2 Examples",
+    "text": "1.2 Examples"
   }
 ]

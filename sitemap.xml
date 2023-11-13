@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://nsiccha.github.io/ReparametrizableDistributions.jl/index.html</loc>
-    <lastmod>2023-11-08T14:31:04.104Z</lastmod>
+    <loc>https://nsiccha.github.io/ReparametrizableDistributions.jl/examples/ScaleHierarchy.html</loc>
+    <lastmod>2023-11-13T09:18:01.494Z</lastmod>
   </url>
   <url>
-    <loc>https://nsiccha.github.io/ReparametrizableDistributions.jl/examples/ScaleHierarchy.html</loc>
-    <lastmod>2023-11-08T14:31:04.972Z</lastmod>
+    <loc>https://nsiccha.github.io/ReparametrizableDistributions.jl/index.html</loc>
+    <lastmod>2023-11-13T09:18:01.854Z</lastmod>
   </url>
 </urlset>
