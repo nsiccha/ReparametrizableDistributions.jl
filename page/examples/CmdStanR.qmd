@@ -1,0 +1,66 @@
+---
+title: "Scale hierarchy reparametrization using `CmdStanR` and `JuliaCall`"
+date: 2023/11/14
+execute:
+  cache: false
+---
+
+Using `ReparametrizableDistributions.jl` from R to reparametrize a Stan model using `CmdStanR` and `JuliaCall`.
+
+## Initializing, fitting, reparametrizing and refitting
+```{r}
+#| output: false
+
+library(pacman)
+p_load(cmdstanr, posterior, JuliaCall)
+
+julia_library("Pkg")
+julia_command("Pkg.activate(\"..\")")
+julia_library("ReparametrizableDistributions")
+julia_library("Optim")
+julia_library("ReverseDiff")
+
+mod_grp <- cmdstan_model("stan/dynamic.stan")
+
+ng <- 10
+n_obs = 100
+
+data_grp <- list(
+  N = n_obs * ng,
+  K = ng,
+  x = rep(1:ng, n_obs)
+)
+
+data_grp$y <- rnorm(ng*n_obs,mean=data_grp$x)
+
+
+data_grp$centeredness <- rep(0, ng)
+fit <- mod_grp$sample(data = data_grp)
+
+
+d <- fit$draws(c("mu", "log_sigma0"))
+
+log_sigma0 <- t(matrix(extract_variable(d, "log_sigma0")))
+
+mu <- t(matrix(subset_draws(d, "mu"), ncol = ng))
+
+data_grp$centeredness <- julia_call("ReparametrizableDistributions.find_centeredness", log_sigma0, mu, rep(0, ng))
+
+afit <- mod_grp$sample(data = data_grp, chains = 4) 
+```
+## Initial fit diagnostics and summary
+```{r}
+fit$diagnostic_summary()
+fit$summary(c("sigma0", "sigma", "mu"))
+```
+## Refit diagnostics and summary
+```{r}
+data_grp$centeredness
+afit$diagnostic_summary()
+afit$summary(c("sigma0", "sigma", "mu"))
+```
+# Appendix
+
+## stan/dynamic.stan
+```{.stan include="stan/dynamic.stan"}
+```
