@@ -2,7 +2,8 @@
   {
     "listing": "/index.html",
     "items": [
-      "/examples/ScaleHierarchy.html"
+      "/examples/ScaleHierarchy.html",
+      "/examples/CmdStanR.html"
     ]
   }
 ]
