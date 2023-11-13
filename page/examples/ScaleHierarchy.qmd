@@ -1,38 +1,49 @@
 ---
 title: "Scale hierarchy reparametrization"
-date: 2023/11/08
+date: 2023/11/13
 ---
 
-Finding the best centeredness for a scale hierarchy.
+Finding the best centeredness for a scale hierarchy using independent draws from a funnel.
 
+## Independently sampling from the funnel
 ```{julia}
 
-using Optim, ReverseDiff, Random, Distributions
-
-using ReparametrizableDistributions
+using Random, Distributions, DynamicPlots
  
 rng = Xoshiro(0)
 
 n_parameters = 999
 n_draws = 1000
 
-
 log_scales = rand(rng, Normal(), (n_parameters, n_draws))
 xi = rand(rng, Normal(), (n_parameters, n_draws))
 x = exp.(log_scales) .* xi
 
-scale_hierarchy = ScaleHierarchy([], ones(n_parameters))
+Figure([
+    Scatter(x[1, :], log_scales[1, :], xlabel="x1", ylabel="log scale", title="\ncentered"),
+    Scatter(xi[1, :], log_scales[1, :], xlabel="xi1", ylabel="log scale", title="\nnon-centered"),
+], plot_title="Centered vs non-centered parametrization")'
+```
 
-@time result = find_reparametrization(scale_hierarchy, [
-    (;log_scale, weights)
-    for (log_scale, weights) in zip(eachcol(log_scales), eachcol(x))
-]);
+## Reparametrizing the funnel
 
-centeredness = ReparametrizableDistributions.find_centeredness(log_scales, x, ones(n_parameters))
+
+```{julia}
+# Currently, the three below "imports" are needed 
+using Optim, ReverseDiff, ReparametrizableDistributions
+
+@time centeredness = ReparametrizableDistributions.find_centeredness(
+    log_scales, x, ones(n_parameters)
+)
  
 ```
-The below visualization needs the DynamicPlots package. 
+
+## Visualizing the found parametrization parameters
+
 ```{julia}
 using DynamicPlots 
-ECDFPlot(result.centeredness, xlabel="centeredness", label="estimated") + Vline([0], label="ideal") 
+ECDFPlot(centeredness, xlabel="centeredness", label="estimated") + Vline([0], label="ideal") 
 ``` 
+
+
+(The above visualizations uses the `DynamicPlots` package, but any other plotting packages works as well or better.)

@@ -14,12 +14,12 @@ parameters {
 }
 
 transformed parameters {
- vector[K] mu = mu_z .* sigma0^(1-centeredness);
+ vector[K] mu = mu_z .* sigma0 .^ (1 - centeredness);
 }
 
 model {
   sigma0 ~ normal(0, 100); // weakly informative prior
-  mu_z ~ normal(0, sigma0^(centeredness)); // population prior with unknown parameters
+  mu_z ~ normal(0, sigma0 .^ (centeredness)); // population prior with unknown parameters
 
   sigma ~ lognormal(0, .5); // weakly informative prior
   y ~ normal(mu[x], sigma); // observation model / likelihood
