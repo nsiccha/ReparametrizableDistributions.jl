@@ -29,4 +29,5 @@ freeze: true
 title-block-banner: true
 filters:
    - lightbox
+   - include-code-files 
 lightbox: auto
