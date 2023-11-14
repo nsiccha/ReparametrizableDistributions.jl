@@ -13,7 +13,7 @@
 /.quarto/
 _freeze
 _site
-.jupyter_cache
+*_cache
 *_files
 figs
 *.rmarkdown
