@@ -10,7 +10,7 @@ lpdf_update(source::R2D2, draw::NamedTuple, lpdf=0.) = begin
     R2 = logistic.(draw.logit_R2)
     tau = R2 ./ (1 .- R2)
     simplex = lpdf_and_invariants(source.simplex, draw.simplex)
-    log_scale = log.((sigma.*tau) .* sqrt.(simplex.weights))
+    log_scale = log.((sigma.*tau) .* sqrt.(1e-16 .+ simplex.weights))
     hierarchy = lpdf_and_invariants(source.hierarchy, (;log_scale, weights=draw.hierarchy))
     lpdf += sum_logpdf(source.log_sigma, draw.log_sigma)
     lpdf += sum_logpdf(source.logit_R2, draw.logit_R2)
