@@ -36,7 +36,7 @@ lja_update(source::GammaSimplex, target::GammaSimplex, invariants::NamedTuple, l
     unnormalized_weights = invariants.weights .* weights_sum
     weights = quantile_cdf.(Normal(), target.parametrization_gammas, unnormalized_weights)
     lja += sum_logpdf(Normal(), weights)
-    lja -= logpdf(tinfo.parametrization_distribution, invariants.weights)
+    lja -= logpdf(target.parametrization_distribution, invariants.weights)
     (;lja, weights, weights_sum)
 end
 
