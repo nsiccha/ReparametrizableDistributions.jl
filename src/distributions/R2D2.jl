@@ -18,3 +18,4 @@ lpdf_update(source::R2D2, draw::NamedTuple, lpdf=0.) = begin
     lpdf += hierarchy.lpdf
     (;lpdf, simplex, hierarchy, sigma, R2, tau)
 end
+recombine(source::R2D2, reparts::NamedTuple) = R2D2(merge(info(source), reparts))
