@@ -16,7 +16,7 @@ LogDensityProblems.capabilities(::Type{<:ReparametrizableBSLDP}) = LogDensityPro
 LogDensityProblems.logdensity(source::ReparametrizableBSLDP, draw::AbstractVector) = try 
     BridgeStan.log_density(source.proxy, collect(draw))
 catch e
-    @info """
+    @debug """
 Failed to evaluate log density: 
 $source
 $draw
@@ -27,7 +27,7 @@ end
 LogDensityProblems.logdensity_and_gradient(source::ReparametrizableBSLDP, draw::AbstractVector) = try 
     BridgeStan.log_density_gradient(source.proxy, collect(draw))
 catch e
-    @info """
+    @debug """
 Failed to evaluate log density gradient: 
 $source
 $draw
@@ -38,7 +38,7 @@ end
 LogDensityProblems.logdensity_gradient_and_hessian(source::ReparametrizableBSLDP, draw::AbstractVector) = try 
     BridgeStan.log_density_hessian(source.proxy, collect(draw))
 catch e
-    @info """
+    @debug """
 Failed to evaluate log density gradient: 
 $source
 $draw
