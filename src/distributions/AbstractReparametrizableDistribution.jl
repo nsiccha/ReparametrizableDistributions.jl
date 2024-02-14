@@ -77,7 +77,7 @@ LogDensityProblems.dimension(source::AbstractReparametrizableDistribution) = len
 LogDensityProblems.logdensity(source::AbstractReparametrizableDistribution, draw::AbstractVector) = try 
     lpdf_and_invariants(source, draw).lpdf
 catch e
-    @warn """
+    @info """
 Failed to evaluate log density: 
 $source
 $draw
