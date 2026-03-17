@@ -1,40 +1,56 @@
 module ReparametrizableDistributions
 
-export LocScaleHierarchy, ScaleHierarchy, TScaleHierarchy, MeanShift, GammaSimplex, HSGP, PHSGP, R2D2, RHS, Directional, ReparametrizablePosterior, ReparametrizableBSLDP, FixedDistribution, find_reparametrization
+using Distributions, LinearAlgebra, LogExpFunctions
 
-export log_transform
+export FusedTransform, advance!!, fused_logdensity, constrain
+export NormalTransform, LKJCholeskyTransform, AffineNormalTransform
+export CorrelatedEffectsTransform, scales_from_cholesky
 
-using WarmupHMC, Distributions, LogDensityProblems, LogExpFunctions
-using SpecialFunctions, HypergeometricFunctions, ChainRulesCore
-using BridgeStan, JSON
+"""
+    advance!!(x, pos)
 
-import WarmupHMC: reparametrization_parameters, optimization_reparametrization_parameters, reparametrize, lpdf_and_invariants, lja_and_reparametrize, to_array, to_nt, lpdf_update, lja_update, find_reparametrization
+Consume one element from `x` at position `pos+1`. Returns `(value, new_pos)`.
+"""
+advance!!(x, pos) = x[pos+1], pos+1
 
-import LogDensityProblemsAD: ADgradient, ADGradientWrapper
+"""
+    advance!!(x, pos, n)
 
-kmap_(f, args...; kwargs...) = map((args...)->f(args...; kwargs...), args...)
-kmap(f, args...; kwargs...) = kmap_(f, args...; kwargs...)
-kmap(f, arg::NamedTuple, args...; kwargs...) = kmap_(f, arg, ensure_like.(Ref(arg), args)...; kwargs...)
-ensure_like(::NamedTuple{names}, rhs::NamedTuple) where {names} = NamedTuple{names}(rhs)
-ensure_like(::NamedTuple{names}, rhs) where {names} = NamedTuple{names}((rhs for name in names))
+Consume `n` elements from `x` starting at `pos+1`. Returns `(view, new_pos)`.
+"""
+advance!!(x, pos, n) = view(x, pos+1:pos+n), pos+n
 
-include("utils/StackedArray.jl")
-include("utils/finite_unconstraining.jl")
-include("utils/quantile_and_cdf.jl")
-include("utils/transform.jl")
-include("distributions/AbstractReparametrizableDistribution.jl")
-include("distributions/ScaleHierarchy.jl")
-include("distributions/MeanShift.jl")
-include("distributions/Directional.jl")
-include("distributions/GammaSimplex.jl")
-include("distributions/AbstractWrappedDistribution.jl")
-include("distributions/FixedDistribution.jl")
-include("distributions/AbstractCompositeReparametrizableDistribution.jl")
-include("distributions/HSGP.jl")
-include("distributions/R2D2.jl")
-include("distributions/RHS.jl")
-include("distributions/ReparametrizablePosterior.jl")
-include("distributions/ReparametrizableBSLDP.jl")
-include("utils/convenience.jl")
+"""
+    FusedTransform
+
+Abstract supertype for fused bijector + log-prior-density transforms.
+
+A `FusedTransform` jointly:
+1. Maps unconstrained parameters to constrained space (the bijection)
+2. Computes the log prior density contribution (including the Jacobian adjustment)
+
+This avoids the overhead and numerical issues of computing the transformation
+and its log-Jacobian-determinant separately.
+
+Subtypes must implement [`fused_logdensity`](@ref).
+"""
+abstract type FusedTransform end
+
+"""
+    fused_logdensity(t::FusedTransform, x; init=(0.0, 0))
+
+Consume unconstrained parameters from `x`, write the constrained result into `t`,
+and return `(logdensity, pos)` where `logdensity` is the accumulated log prior density
+(including Jacobian adjustments) and `pos` is the new position in `x`.
+
+`init` is a tuple `(logdensity_accumulator, starting_position)`.
+"""
+function fused_logdensity end
+
+include("log_abs_tanh.jl")
+include("transforms/normal.jl")
+include("transforms/affine_normal.jl")
+include("transforms/lkj_cholesky.jl")
+include("transforms/correlated_effects.jl")
 
 end # module ReparametrizableDistributions

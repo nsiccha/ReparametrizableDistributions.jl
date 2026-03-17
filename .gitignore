@@ -1,2 +1,5 @@
 figs
 .vscode
+Manifest.toml
+web/cache/
+web/app/Manifest.toml
