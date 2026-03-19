@@ -2,7 +2,7 @@ module ReparametrizableDistributions
 
 using Distributions, LinearAlgebra, LogExpFunctions
 
-export FusedTransform, advance!!, fused_logdensity, constrain
+export FusedTransform, advance!!, fused_logdensity, constrain, nparams
 export NormalTransform, LKJCholeskyTransform, AffineNormalTransform
 export CorrelatedEffectsTransform, scales_from_cholesky
 
