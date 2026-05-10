@@ -45,7 +45,7 @@ end
         content
     )); pico_version="2")
 
-    @get index = h.div(
+    @get index() = h.div(
         h.h1("FusedTransforms"),
         h.p("Available transforms:"),
         h.ul([
