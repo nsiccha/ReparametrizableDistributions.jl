@@ -40,10 +40,10 @@ end
 
 @htmx struct AppContext
 
-    __page__(content) = htmx(h.body(h.main(class="container")(
+    __page__(content) = htmx(h.main(class="container")(
         h.nav(h.ul(h.li(h.a(href="/")("ReparametrizableDistributions")))),
         content
-    )); pico_version="2")
+    ); pico_version="2")
 
     @get index() = h.div(
         h.h1("FusedTransforms"),
