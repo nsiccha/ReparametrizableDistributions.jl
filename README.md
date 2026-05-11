@@ -14,13 +14,16 @@ Pkg.add(url="https://github.com/nsiccha/ReparametrizableDistributions.jl")
 ```julia
 using ReparametrizableDistributions
 
-# Normal transform: unconstrained → Normal(0, 1)
-t = NormalTransform(0.0)
-logd, pos = fused_logdensity(t, [0.5])
+# Standard normal prior on n parameters
+t = NormalTransform(3)
+x = randn(nparams(t))
+logd, pos = fused_logdensity(t, x)
 
-# LKJ Cholesky transform for correlation matrices
-t = LKJCholeskyTransform(3, 2.0)
-np = nparams(t)  # number of unconstrained parameters
+# LKJ Cholesky transform for a 3×3 correlation matrix
+t = LKJCholeskyTransform(3; eta=2.0)
+x = randn(nparams(t))
+logd, pos = fused_logdensity(t, x)
+# `t.L` now holds the constrained Cholesky factor
 ```
 
 ## Transforms
