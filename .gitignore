@@ -3,3 +3,6 @@ figs
 Manifest.toml
 web/cache/
 web/app/Manifest.toml
+
+# Auto-generated HTMXObjects recording outputs — not committed to main
+docs/src/public/live-*/
