@@ -5,8 +5,7 @@ HTMXObjects = "b12ef442-5798-4353-80f3-9562b03a0cb6"
 ReparametrizableDistributions = "7d03e222-df96-4b80-bcdc-d089be88b5f2"
 
 [sources.HTMXObjects]
-rev = "dev"
-url = "https://github.com/nsiccha/HTMXObjects.jl.git"
+path = "../HTMXObjects.jl"
 
 [sources.ReparametrizableDistributions]
 path = ".."
