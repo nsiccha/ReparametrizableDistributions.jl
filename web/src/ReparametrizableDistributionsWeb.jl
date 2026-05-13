@@ -40,17 +40,17 @@ const APPDATA = RdAppData()
     ); pico_version="2")
 
     # Bundle of available FusedTransform variants for the legacy /demo route.
-    # Adding a new variant is a single `@struct foo = begin label, description,
+    # Adding a new variant is a single `@include foo = begin label, description,
     # build(dim), extra_text(t) end` inside this bundle.
-    @struct variants = begin
-        @struct normal = begin
+    @include variants = begin
+        @include normal = begin
             label       = "NormalTransform"
             description = "Identity transform + standard normal prior"
             build(dim::Int) = NormalTransform(dim)
             extra_text(transform) = ""
         end
 
-        @struct lkj_cholesky = begin
+        @include lkj_cholesky = begin
             label       = "LKJCholeskyTransform"
             description = "Cholesky factor reparametrization + LKJ prior"
             build(dim::Int) = LKJCholeskyTransform(dim)
