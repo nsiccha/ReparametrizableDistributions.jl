@@ -1,9 +1,7 @@
 using Documenter, DocumenterVitepress, ReparametrizableDistributions
-import HTMXObjects
 
-# Sync the canonical `htmxo-embed.ts` (+ companion CSS) into our theme dir
-# before DocumenterVitepress runs. The theme's `index.ts` imports from it.
-HTMXObjects.vitepress_theme_install(joinpath(@__DIR__, "src", ".vitepress", "theme"))
+# The HTMXObjects embed runtime (`htmxo-embed.ts` + companion CSS) is committed
+# in `src/.vitepress/theme/`; see the note in its `index.ts` for re-syncing.
 
 makedocs(
     sitename = "ReparametrizableDistributions.jl",
